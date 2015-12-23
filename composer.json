@@ -3,12 +3,11 @@
     "description": "Silex with enhanced DI",
     "type": "project",
     "require": {
-        "silex/silex": "1.3",
-        "tomverran/di-container-mock": "*"
+        "silex/silex": "1.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8",
-        "tomverran/di-container-mock": "*"
+        "clearbooks/di-container-mock": "1.0.0"
     },
     "license": "LGPL-v3",
     "authors": [
@@ -19,8 +18,8 @@
     ],
     "repositories": [
         {
-            "type": "composer",
-            "url": "https://carefulcoder.co.uk/composer"
+            "type": "vcs",
+            "url": "git@github.com:clearbooks/di-container-mock.git"
         }
     ],
     "autoload": {
@@ -33,5 +32,5 @@
             "Clearbooks\\Dilex\\": "test/"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable"
 }
