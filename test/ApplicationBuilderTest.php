@@ -4,7 +4,7 @@
 namespace Clearbooks\Dilex;
 
 
-use Silex\Application;
+use Clearbooks\Dilex\Dilex\Dilex;
 use Symfony\Component\HttpKernel\Tests\Controller;
 use TomVerran\MockContainer;
 
@@ -15,7 +15,7 @@ class ApplicationBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function givenApplication_setControllerAndCallbackResolver()
     {
-        $app = new Application();
+        $app = new Dilex();
         ApplicationBuilder::build( new MockContainer( [] ), $app );
         $this->assertInstanceOf( CallbackResolver::class, $app['callback_resolver'] );
         $this->assertInstanceOf( ControllerResolver::class, $app['resolver'] );
