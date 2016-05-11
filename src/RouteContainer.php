@@ -1,10 +1,8 @@
 <?php
 
 
-namespace Clearbooks\Dilex\Dilex;
+namespace Clearbooks\Dilex;
 
-
-use Clearbooks\Dilex\Endpoint;
 use Silex\Controller;
 
 interface RouteContainer

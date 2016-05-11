@@ -3,8 +3,6 @@
 
 namespace Clearbooks\Dilex;
 
-
-use Clearbooks\Dilex\Dilex\Dilex;
 use Symfony\Component\HttpKernel\Tests\Controller;
 use TomVerran\MockContainer;
 

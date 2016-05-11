@@ -1,10 +1,8 @@
 <?php
 
 
-namespace Clearbooks\Dilex\Dilex;
+namespace Clearbooks\Dilex;
 
-use Clearbooks\Dilex\Endpoint;
-use Clearbooks\Dilex\Middleware;
 use Silex\Application;
 
 class Dilex extends Application implements RouteContainer, MiddlewareContainer

@@ -1,10 +1,8 @@
 <?php
 
 
-namespace Clearbooks\Dilex\Dilex;
+namespace Clearbooks\Dilex;
 
-
-use Clearbooks\Dilex\Middleware;
 use Silex\Application;
 
 interface MiddlewareContainer

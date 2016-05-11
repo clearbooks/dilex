@@ -1,6 +1,5 @@
 <?php
 namespace Clearbooks\Dilex;
-use Clearbooks\Dilex\Dilex\Dilex;
 use stdClass;
 use TomVerran\MockContainer;
 
