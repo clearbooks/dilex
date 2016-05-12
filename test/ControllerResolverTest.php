@@ -1,6 +1,5 @@
 <?php
 namespace Clearbooks\Dilex;
-use Silex\Application;
 use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 use TomVerran\MockContainer;
@@ -18,7 +17,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     private $resolver;
 
     /**
-     * @var Application
+     * @var Dilex
      */
     private $app;
 
@@ -45,7 +44,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->app = new Application;
+        $this->app = new Dilex();
         $this->mockContainer = new MockContainer( [ EndpointDummy::class => new EndpointDummy ] );
         $this->resolver = new ControllerResolver( $this->app, $this->mockContainer );
     }

@@ -1,6 +1,5 @@
 <?php
 namespace Clearbooks\Dilex;
-use Silex\Application;
 use stdClass;
 use TomVerran\MockContainer;
 
@@ -17,7 +16,7 @@ class CallbackResolverTest extends \PHPUnit_Framework_TestCase
     private $resolver;
 
     /**
-     * @var Application
+     * @var Dilex
      */
     private $app;
 
@@ -35,7 +34,7 @@ class CallbackResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->app = new Application;
+        $this->app = new Dilex;
         $this->mockContainer = new MockContainer( [ MiddlewareDummy::class => new MiddlewareDummy ] );
         $this->resolver = new CallbackResolver( $this->mockContainer, $this->app );
     }

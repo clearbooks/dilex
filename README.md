@@ -14,10 +14,12 @@ Instead of being handled by callables ```before``` and ```get``` now require you
 
 ## Usage
 
-To apply the Dilex extensions to a Silex ```Application``` object you use the provided ```ApplicationBuilder``` which requires an ```Application``` and a ```ContainerInterop``` compliant dependency injection container
+To apply the Dilex extensions to an instance of ```Dilex``` object (which extends Silex ```Application```) you use the provided ```ApplicationBuilder``` which requires an ```Application``` and a ```ContainerInterop``` compliant dependency injection container
+
+(Dilex allows you to use either the Silex ```Application``` class or the ```Dilex`` class with the ApplicationBuilder)
 
 ```php
-$application = new \Silex\Application;
+$application = new \Clearbooks\Dilex\Dilex;
 $container = new DependencyInjectionContainer(); // replace with your real DI initialisation code
 \Clearbooks\Dilex\ApplicationBuilder::build( $container, $application );
 ```
