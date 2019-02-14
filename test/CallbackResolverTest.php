@@ -54,7 +54,7 @@ class CallbackResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function givenClassWhichIsNotMiddleware_throwException()
     {
-        $this->resolve( StdClass::class );
+        $this->resolve( stdClass::class );
     }
 
     /**

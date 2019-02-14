@@ -63,7 +63,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function givenClassWhichIsNotAnEndpoint_throwException()
     {
-        $this->assertFalse( $this->resolve( StdClass::class ) );
+        $this->assertFalse( $this->resolve( stdClass::class ) );
     }
 
     /**
