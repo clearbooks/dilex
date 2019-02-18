@@ -4,5 +4,9 @@ php:
   - 7.1
   - 7.2
 
-install: composer install --dev --prefer-dist --no-interaction
+env:
+  global:
+    - secure: KIzGF6GhB0loRyrDRY6iuiexwd7TKZ0P4/cbH9emJEXFSDfUItDlxzgpbwUms5+JErYjpm3maxpd/ituhUmyO6tP39pdcnWJkt895ry7ZgB7V06Apg33VMI2a4RpfNbuypZVrNzRT09BGFeCGWrZFXySF2aoLvxY3SdLe8o4u9mWRjvCnnDbvNhnQFpCtIJe8UtOKMj1lKZdRbVdeggt60sIKVSCb5LHQvK94aagf2CPu0bp4B9w00e12p5auDqxzYy6zZM/Eb30fGh5q5sdWze7ysCGccZUGg9ijeoltAut5/8SFdy0EY6/pkUNEjbmsDIEUEb4xYRptqzn1PPd5diQxY7yg8bqo35mM0t+at6HXGj6V09q1yR6/9ktm1tkKUOBFDdyRMNHfaW98xWuDhtuLKXHp0lW+GpBgHKuJHfVeKpSVoazMgrWPe7LFIHRiokH6lKJmU00zw14iXt6Ry3G1Qqh3Bwd3kqj61KYDmHxcY+FUGzjTA4wYc9aeBDFAdpwhu8JrNLpaX+i7rio7ObmEHskh3DIaPdjlVEeQJVgjc1XwqMjKlzwlCu94srcLBt0u+5O3CbnMHlVMMQSc8auVs5lx7dFaRgzygsrDS2hgmg5SX1Aigt1zciDHK7hN0HIqy31K+wilVRHcVdqGY3wGYG+CoNhI4uf+mY5W/Y=
+
+install: composer config -g github-oauth.github.com "$GH_TOKEN" && composer install --dev --prefer-dist --no-interaction
 script: vendor/phpunit/phpunit/phpunit --coverage-clover build/logs/clover.xml test
