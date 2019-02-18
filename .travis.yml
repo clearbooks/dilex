@@ -4,5 +4,5 @@ php:
   - 7.1
   - 7.2
 
-install: composer install --dev
+install: composer install --dev --prefer-dist --no-interaction
 script: vendor/phpunit/phpunit/phpunit --coverage-clover build/logs/clover.xml test
