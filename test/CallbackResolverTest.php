@@ -1,9 +1,10 @@
 <?php
 namespace Clearbooks\Dilex;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 use TomVerran\MockContainer;
 
-class CallbackResolverTest extends \PHPUnit_Framework_TestCase
+class CallbackResolverTest extends TestCase
 {
     /**
      * @var MockContainer

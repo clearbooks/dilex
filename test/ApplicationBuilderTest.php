@@ -1,12 +1,11 @@
 <?php
 
-
 namespace Clearbooks\Dilex;
 
-use Symfony\Component\HttpKernel\Tests\Controller;
+use PHPUnit\Framework\TestCase;
 use TomVerran\MockContainer;
 
-class ApplicationBuilderTest extends \PHPUnit_Framework_TestCase
+class ApplicationBuilderTest extends TestCase
 {
     /**
      * @test

@@ -1,10 +1,11 @@
 <?php
 namespace Clearbooks\Dilex;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 use TomVerran\MockContainer;
 
-class ControllerResolverTest extends \PHPUnit_Framework_TestCase
+class ControllerResolverTest extends TestCase
 {
     /**
      * @var MockContainer
