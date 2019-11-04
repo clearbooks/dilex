@@ -78,7 +78,7 @@ class Dilex extends Application implements RouteContainer, MiddlewareContainer
     }
 
     /**
-     * @param Middleware $middleware
+     * @param Middleware|string $middleware
      * @param int $priority
      */
     public function before( $middleware, $priority = 0 )
@@ -87,7 +87,7 @@ class Dilex extends Application implements RouteContainer, MiddlewareContainer
     }
 
     /**
-     * @param Middleware $middleware
+     * @param Middleware|string $middleware
      * @param int $priority
      */
     public function after( $middleware, $priority = 0 )

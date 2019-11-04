@@ -64,7 +64,7 @@ class ControllerResolverTest extends TestCase
      */
     public function givenClassWhichIsNotAnEndpoint_throwException()
     {
-        $this->assertFalse( $this->resolve( StdClass::class ) );
+        $this->assertFalse( $this->resolve( stdClass::class ) );
     }
 
     /**

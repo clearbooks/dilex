@@ -55,7 +55,7 @@ class CallbackResolverTest extends TestCase
      */
     public function givenClassWhichIsNotMiddleware_throwException()
     {
-        $this->resolve( StdClass::class );
+        $this->resolve( stdClass::class );
     }
 
     /**
