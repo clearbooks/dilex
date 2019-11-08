@@ -18,11 +18,6 @@ class ControllerResolverTest extends TestCase
     private $resolver;
 
     /**
-     * @var Dilex
-     */
-    private $app;
-
-    /**
      * Get a request for the given controller
      * @param $controller
      * @return Request
@@ -43,11 +38,11 @@ class ControllerResolverTest extends TestCase
     /**
      * Set up
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->app = new Dilex();
         $this->mockContainer = new MockContainer( [ EndpointDummy::class => new EndpointDummy ] );
-        $this->resolver = new ControllerResolver( $this->app, $this->mockContainer );
+        $this->resolver = new ControllerResolver( $this->mockContainer );
     }
 
     /**
@@ -60,10 +55,10 @@ class ControllerResolverTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Exception
      */
     public function givenClassWhichIsNotAnEndpoint_throwException()
     {
+        $this->expectException(\Exception::class);
         $this->assertFalse( $this->resolve( stdClass::class ) );
     }
 

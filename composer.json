@@ -3,11 +3,12 @@
     "description": "Silex with enhanced DI",
     "type": "project",
     "require": {
-        "silex/silex": "^1.3"
+        "php": ">=7.2",
+        "silex/silex": "^2.3"
     },
     "require-dev": {
         "clearbooks/di-container-mock": "1.0.0",
-        "phpunit/phpunit": "^6"
+        "phpunit/phpunit": "^8"
     },
     "license": "LGPL-3.0",
     "authors": [

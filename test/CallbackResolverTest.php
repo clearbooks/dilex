@@ -33,7 +33,7 @@ class CallbackResolverTest extends TestCase
     /**
      * Set up
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->app = new Dilex;
         $this->mockContainer = new MockContainer( [ MiddlewareDummy::class => new MiddlewareDummy ] );
@@ -42,19 +42,19 @@ class CallbackResolverTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Exception
      */
     public function givenNullName_throwException()
     {
+        $this->expectException(\Exception::class);
         $this->resolve( null );
     }
 
     /**
      * @test
-     * @expectedException \Exception
      */
     public function givenClassWhichIsNotMiddleware_throwException()
     {
+        $this->expectException(\Exception::class);
         $this->resolve( stdClass::class );
     }
 
