@@ -35,6 +35,7 @@ class ApplicationTest extends TestCase
         $this->app->post(self::ERROR_ENDPOINT, ErrorThrowingController::class);
 
         $this->app->error(function ($e) {
+            var_dump($e);
             $this->error = $e;
         });
     }
