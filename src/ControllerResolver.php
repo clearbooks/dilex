@@ -2,11 +2,12 @@
 namespace Clearbooks\Dilex;
 use Interop\Container\ContainerInterface;
 use Silex\Application;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class ControllerResolver
  */
-class ControllerResolver extends \Silex\ControllerResolver
+class ControllerResolver extends \Symfony\Component\HttpKernel\Controller\ControllerResolver
 {
     /**
      * @var ContainerInterface
@@ -14,12 +15,11 @@ class ControllerResolver extends \Silex\ControllerResolver
     private $container;
 
     /**
-     * @param Application $app
      * @param ContainerInterface $container
      */
-    public function __construct( Application $app, ContainerInterface $container )
+    public function __construct( ContainerInterface $container )
     {
-        parent::__construct( $app );
+        parent::__construct();
         $this->container = $container;
     }
 

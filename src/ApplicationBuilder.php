@@ -14,6 +14,6 @@ abstract class ApplicationBuilder
     public static function build( ContainerInterface $container, Application $app )
     {
         $app['callback_resolver'] =  new CallbackResolver( $container, $app );
-        $app['resolver'] =  new ControllerResolver( $app, $container );
+        $app['resolver'] =  new ControllerResolver( $container );
     }
 }
