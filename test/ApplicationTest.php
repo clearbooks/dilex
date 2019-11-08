@@ -28,14 +28,13 @@ class ApplicationTest extends TestCase
         $this->error = null;
         $this->app = new Dilex();
         ApplicationBuilder::build( new MockContainer( [
-            EchoController::class => EchoController::class,
-            ErrorThrowingController::class => ErrorThrowingController::class
+            EchoController::class => new EchoController(),
+            ErrorThrowingController::class => new ErrorThrowingController()
         ] ), $this->app );
         $this->app->post(self::ECHO_ENDPOINT, EchoController::class);
         $this->app->post(self::ERROR_ENDPOINT, ErrorThrowingController::class);
 
         $this->app->error(function ($e) {
-            var_dump($e);
             $this->error = $e;
         });
     }
