@@ -5,6 +5,7 @@ namespace Clearbooks\Dilex;
 use Exception;
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -13,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouteCollectionBuilder;
@@ -35,6 +37,11 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
      * @var array
      */
     private $beforeRequestListeners = [];
+
+    /**
+     * @var array
+     */
+    private $afterRequestListeners = [];
 
     public function __construct( string $environment, bool $debug,
                                  ContainerInterface $fallbackContainerInterface = null )
@@ -113,7 +120,7 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
         return $route;
     }
 
-    private function initializeBeforeRequestListeners(): void
+    private function initializeListeners(): void
     {
         foreach ( $this->beforeRequestListeners as [ $beforeRequestListener, $priority ] ) {
             /** @var EventDispatcherInterface $eventDispatcher */
@@ -130,6 +137,32 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
                         $result = $callback->execute( $event->getRequest() );
                         if ( $result instanceof Response ) {
                             $event->setResponse( $result );
+                        }
+                    },
+                    $priority
+            );
+        }
+
+        foreach ( $this->afterRequestListeners as [ $afterRequestListener, $priority ] ) {
+            /** @var EventDispatcherInterface $eventDispatcher */
+            $eventDispatcher = $this->getContainer()->get( EventDispatcherInterface::class );
+            $eventDispatcher->addListener(
+                    KernelEvents::RESPONSE,
+                    function( ResponseEvent $event ) use ( $afterRequestListener ) {
+                        if ( !$event->isMasterRequest() ) {
+                            return;
+                        }
+
+                        if ( is_string( $afterRequestListener ) && strpos( $afterRequestListener, '::' ) !== false ) {
+                            [ $class, $method ] = explode( '::', $afterRequestListener, 2 );
+                            $afterRequestListener = [ $this->getContainer()->get( $class ), $method ];
+                        }
+
+                        $result = call_user_func( $afterRequestListener, $event->getRequest(), $event->getResponse() );
+                        if ( $result instanceof Response ) {
+                            $event->setResponse( $result );
+                        } else if ( $result !== null ) {
+                            throw new RuntimeException( 'Invalid after middleware response.' );
                         }
                     },
                     $priority
@@ -178,6 +211,11 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
         $this->beforeRequestListeners[] = [ $beforeRequestListener, $priority ];
     }
 
+    public function after( callable $callback, int $priority = 0 ): void
+    {
+        $this->afterRequestListeners[] = [ $callback, $priority ];
+    }
+
     /**
      * Handles the request and delivers the response.
      *
@@ -191,7 +229,7 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
         }
 
         $this->boot();
-        $this->initializeBeforeRequestListeners();
+        $this->initializeListeners();
         $response = $this->handle( $request );
         $response->send();
         $this->terminate( $request, $response );
