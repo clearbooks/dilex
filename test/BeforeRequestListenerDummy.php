@@ -2,7 +2,7 @@
 namespace Clearbooks\Dilex;
 use Symfony\Component\HttpFoundation\Request;
 
-class MiddlewareDummy implements Middleware
+class BeforeRequestListenerDummy implements BeforeRequestListener
 {
     /**
      * @param Request $request

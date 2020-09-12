@@ -1,13 +1,18 @@
 {
     "name": "clearbooks/dilex",
     "description": "Silex with enhanced DI",
-    "type": "project",
+    "type": "library",
     "require": {
         "php": ">=7.2",
-        "silex/silex": "^2.3"
+        "ext-json": "*",
+        "psr/container": "^1.0",
+        "symfony/http-kernel": "^4.4",
+        "symfony/http-foundation": "^4.4",
+        "symfony/routing": "^4.4",
+        "symfony/framework-bundle": "^4.4",
+        "symfony/dependency-injection": "^4.4"
     },
     "require-dev": {
-        "clearbooks/di-container-mock": "1.0.0",
         "phpunit/phpunit": "^8"
     },
     "license": "LGPL-3.0",
@@ -15,12 +20,6 @@
         {
             "name": "Crimson Ducks",
             "email": "support@clearbooks.co.uk"
-        }
-    ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:clearbooks/di-container-mock.git"
         }
     ],
     "autoload": {
