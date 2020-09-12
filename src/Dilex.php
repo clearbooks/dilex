@@ -122,9 +122,10 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
 
     private function initializeListeners(): void
     {
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->getContainer()->get( EventDispatcherInterface::class );
+
         foreach ( $this->beforeRequestListeners as [ $beforeRequestListener, $priority ] ) {
-            /** @var EventDispatcherInterface $eventDispatcher */
-            $eventDispatcher = $this->getContainer()->get( EventDispatcherInterface::class );
             $eventDispatcher->addListener(
                     KernelEvents::REQUEST,
                     function( RequestEvent $event ) use ( $beforeRequestListener ) {
@@ -144,8 +145,6 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
         }
 
         foreach ( $this->afterRequestListeners as [ $afterRequestListener, $priority ] ) {
-            /** @var EventDispatcherInterface $eventDispatcher */
-            $eventDispatcher = $this->getContainer()->get( EventDispatcherInterface::class );
             $eventDispatcher->addListener(
                     KernelEvents::RESPONSE,
                     function( ResponseEvent $event ) use ( $afterRequestListener ) {
