@@ -9,4 +9,9 @@ class Route extends SymfonyRoute
     {
         return $this->addRequirements( [ $key => $regex ] );
     }
+
+    public function after( callable $callback ): self
+    {
+        return $this;
+    }
 }
