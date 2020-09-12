@@ -1,8 +1,6 @@
 <?php
 namespace Clearbooks\Dilex;
 
-use Symfony\Component\Routing\Route;
-
 interface RouteContainer
 {
     /**

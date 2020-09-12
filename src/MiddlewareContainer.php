@@ -8,7 +8,7 @@ interface MiddlewareContainer
      *
      * Before filters are run before any route has been matched.
      *
-     * @param string $middleware Before filter callback (a class that implements BeforeRequestListener)
+     * @param string $middleware Before filter callback (a class that implements Middleware)
      * @param int   $priority The higher this value, the earlier an event
      *                        listener will be triggered in the chain (defaults to 0)
      */

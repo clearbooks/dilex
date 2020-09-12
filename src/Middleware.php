@@ -3,7 +3,7 @@ namespace Clearbooks\Dilex;
 
 use Symfony\Component\HttpFoundation\Request;
 
-interface BeforeRequestListener
+interface Middleware
 {
     public function execute( Request $request );
 }

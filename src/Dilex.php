@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
 class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
@@ -74,9 +73,9 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
 
     private function checkBeforeRequestListener( string $beforeRequestListener ): void
     {
-        if ( !in_array( BeforeRequestListener::class, class_implements( $beforeRequestListener ) ) ) {
+        if ( !in_array( Middleware::class, class_implements( $beforeRequestListener ) ) ) {
             throw new InvalidArgumentException(
-                    'Class ' . $beforeRequestListener . ' doesn\'t implement ' . BeforeRequestListener::class
+                    'Class ' . $beforeRequestListener . ' doesn\'t implement ' . Middleware::class
             );
         }
     }
@@ -126,7 +125,7 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
                             return;
                         }
 
-                        /** @var BeforeRequestListener $callback */
+                        /** @var Middleware $callback */
                         $callback = $this->getContainer()->get( $beforeRequestListener );
                         $result = $callback->execute( $event->getRequest() );
                         if ( $result instanceof Response ) {
