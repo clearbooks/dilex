@@ -1,6 +1,7 @@
 <?php
 namespace Clearbooks\Dilex;
 
+use Clearbooks\Dilex\EventListener\EventListenerRegistry;
 use InvalidArgumentException;
 
 class RouteRegistry
@@ -22,7 +23,6 @@ class RouteRegistry
     private function createRoute( string $pattern, string $endpoint, string $method = null ): Route
     {
         $this->checkEndpoint( $endpoint );
-
         $route = new Route( $pattern );
         $route->setDefault( '_controller', [ $endpoint, 'execute' ] );
         if ( $method ) {

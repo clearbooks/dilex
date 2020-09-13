@@ -2,6 +2,7 @@
 namespace Clearbooks\Dilex\EventListener\CallbackWrapper;
 
 use Clearbooks\Dilex\ContainerProvider;
+use Clearbooks\Dilex\EventListener\CallbackClassResolver;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 

@@ -1,5 +1,5 @@
 <?php
-namespace Clearbooks\Dilex\EventListener\CallbackWrapper;
+namespace Clearbooks\Dilex\EventListener;
 
 use Clearbooks\Dilex\ContainerProvider;
 

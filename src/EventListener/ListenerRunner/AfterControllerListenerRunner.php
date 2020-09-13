@@ -1,13 +1,16 @@
 <?php
-namespace Clearbooks\Dilex\EventListener\CallbackWrapper;
+namespace Clearbooks\Dilex\EventListener\ListenerRunner;
 
 use Clearbooks\Dilex\ContainerProvider;
 use Clearbooks\Dilex\EventListener\CallbackClassResolver;
+use Clearbooks\Dilex\Route;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\Routing\Router;
 
-class AfterWrapper implements CallbackWrapper
+class AfterControllerListenerRunner
 {
     /**
      * @var ContainerProvider
@@ -25,13 +28,22 @@ class AfterWrapper implements CallbackWrapper
         $this->callbackResolver = new CallbackClassResolver( $containerProvider );
     }
 
-    public function wrap( callable $callback ): callable
+    public function execute( ResponseEvent $event ): void
     {
-        return function( ResponseEvent $event ) use ( $callback ) {
-            if ( !$event->isMasterRequest() ) {
-                return;
-            }
+        $container = $this->containerProvider->getContainer();
 
+        /** @var Router $router */
+        $router = $container->get( 'router' );
+
+        $request = $event->getRequest();
+        $routeName = $request->attributes->get('_route');
+        $route = $router->getRouteCollection()->get( $routeName );
+        if ( !$route ) {
+            return;
+        }
+
+        $callbacks = (array)$route->getOption( Route::OPTION_AFTER_CONTROLLER_LISTENERS );
+        foreach ( $callbacks as $callback ) {
             $result = call_user_func(
                     $this->callbackResolver->resolve( $callback ),
                     $event->getRequest(),
@@ -41,8 +53,8 @@ class AfterWrapper implements CallbackWrapper
             if ( $result instanceof Response ) {
                 $event->setResponse( $result );
             } else if ( $result !== null ) {
-                throw new RuntimeException( 'Invalid after middleware response.' );
+                throw new RuntimeException( 'Invalid after controller middleware response.' );
             }
-        };
+        }
     }
 }

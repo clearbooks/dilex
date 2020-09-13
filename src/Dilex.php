@@ -8,6 +8,8 @@ use Clearbooks\Dilex\EventListener\CallbackWrapper\FinishWrapper;
 use Clearbooks\Dilex\EventListener\EventListenerApplier;
 use Clearbooks\Dilex\EventListener\EventListenerRecord;
 use Clearbooks\Dilex\EventListener\EventListenerRegistry;
+use Clearbooks\Dilex\EventListener\ListenerRunner\AfterControllerListenerRunner;
+use Clearbooks\Dilex\EventListener\ListenerRunner\BeforeControllerListenerRunner;
 use Exception;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -16,9 +18,11 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouteCollectionBuilder;
+use Symfony\Component\Routing\Router;
 
 class Dilex extends Kernel implements RouteContainer, EventListenerApplier
 {
@@ -65,6 +69,16 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
     private $errorEventListenerWrapper;
 
     /**
+     * @var BeforeControllerListenerRunner
+     */
+    private $beforeControllerListenerRunner;
+
+    /**
+     * @var AfterControllerListenerRunner
+     */
+    private $afterControllerListenerRunner;
+
+    /**
      * @var string|null
      */
     private $projectDirectory = null;
@@ -91,6 +105,8 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         $this->afterEventListenerWrapper = new AfterWrapper( $this->containerProvider );
         $this->finishEventListenerWrapper = new FinishWrapper( $this->containerProvider );
         $this->errorEventListenerWrapper = new ErrorWrapper( $this->containerProvider );
+        $this->beforeControllerListenerRunner = new BeforeControllerListenerRunner( $this->containerProvider );
+        $this->afterControllerListenerRunner = new AfterControllerListenerRunner( $this->containerProvider );
     }
 
     public function setProjectDirectory( ?string $projectDirectory ): void
@@ -168,8 +184,33 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         }
     }
 
+    private function addBeforeControllerListenerRunner(): void
+    {
+        $this->eventListenerRegistry->addEvent(
+                new EventListenerRecord(
+                        KernelEvents::REQUEST,
+                        [ $this->beforeControllerListenerRunner, 'execute' ],
+                        -1024
+                )
+        );
+    }
+
+    private function addAfterControllerListenerRunner(): void
+    {
+        $this->eventListenerRegistry->addEvent(
+                new EventListenerRecord(
+                        KernelEvents::RESPONSE,
+                        [ $this->afterControllerListenerRunner, 'execute' ],
+                        128
+                )
+        );
+    }
+
     private function initializeListeners(): void
     {
+        $this->addBeforeControllerListenerRunner();
+        $this->addAfterControllerListenerRunner();
+
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->getContainer()->get( 'event_dispatcher' );
         $this->eventListenerRegistry->registerEvents( $eventDispatcher );
