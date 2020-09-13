@@ -64,6 +64,21 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
      */
     private $errorEventListenerWrapper;
 
+    /**
+     * @var string|null
+     */
+    private $projectDirectory = null;
+
+    /**
+     * @var string|null
+     */
+    private $cacheDirectory = null;
+
+    /**
+     * @var string|null
+     */
+    private $logDirectory = null;
+
     public function __construct( string $environment, bool $debug,
                                  ContainerInterface $fallbackContainerInterface = null )
     {
@@ -76,6 +91,48 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         $this->afterEventListenerWrapper = new AfterWrapper( $this->containerProvider );
         $this->finishEventListenerWrapper = new FinishWrapper( $this->containerProvider );
         $this->errorEventListenerWrapper = new ErrorWrapper( $this->containerProvider );
+    }
+
+    public function setProjectDirectory( ?string $projectDirectory ): void
+    {
+        $this->projectDirectory = rtrim( $projectDirectory, '/' );
+    }
+
+    public function setCacheDirectory( ?string $cacheDirectory ): void
+    {
+        $this->cacheDirectory = '/' . trim( $cacheDirectory, '/' ) . '/';
+    }
+
+    public function setLogDirectory( ?string $logDirectory ): void
+    {
+        $this->logDirectory = '/' . trim( $logDirectory, '/' );
+    }
+
+    public function getProjectDir()
+    {
+        if ( $this->projectDirectory === null ) {
+            return parent::getProjectDir();
+        }
+
+        return $this->projectDirectory;
+    }
+
+    public function getCacheDir()
+    {
+        if ( $this->cacheDirectory === null ) {
+            return parent::getCacheDir();
+        }
+
+        return $this->getProjectDir() . $this->cacheDirectory . $this->getEnvironment();
+    }
+
+    public function getLogDir()
+    {
+        if ( $this->logDirectory === null ) {
+            return parent::getLogDir();
+        }
+
+        return $this->getProjectDir() . $this->logDirectory;
     }
 
     public function registerBundles(): array
