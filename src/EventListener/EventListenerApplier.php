@@ -1,7 +1,7 @@
 <?php
 namespace Clearbooks\Dilex;
 
-interface AddEventListeners
+interface EventListenerApplier
 {
     public function before( callable $callable, int $priority = 0 ): void;
     public function after( callable $callback, int $priority = 0 ): void;

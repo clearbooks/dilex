@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
-class Dilex extends Kernel implements RouteContainer, AddEventListeners
+class Dilex extends Kernel implements RouteContainer, EventListenerApplier
 {
     use MicroKernelTrait;
 

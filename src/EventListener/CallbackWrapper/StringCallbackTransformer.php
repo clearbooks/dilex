@@ -27,9 +27,6 @@ class StringCallbackTransformer
             [ $class, $method ] = explode( '::', $callback, 2 );
             $callback = [ $container->get( $class ), $method ];
         }
-        else if ( $container->has( $callback ) && in_array( Middleware::class, class_implements( $callback ) ) ) {
-            $callback = [ $callback, 'execute' ];
-        }
 
         return $callback;
     }
