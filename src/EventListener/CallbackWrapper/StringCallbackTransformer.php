@@ -2,7 +2,6 @@
 namespace Clearbooks\Dilex\EventListener\CallbackWrapper;
 
 use Clearbooks\Dilex\ContainerProvider;
-use Clearbooks\Dilex\Middleware;
 
 class StringCallbackTransformer
 {

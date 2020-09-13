@@ -1,5 +1,5 @@
 <?php
-namespace Clearbooks\Dilex;
+namespace Clearbooks\Dilex\EventListener;
 
 interface EventListenerApplier
 {

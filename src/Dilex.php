@@ -5,6 +5,7 @@ use Clearbooks\Dilex\EventListener\CallbackWrapper\AfterWrapper;
 use Clearbooks\Dilex\EventListener\CallbackWrapper\BeforeWrapper;
 use Clearbooks\Dilex\EventListener\CallbackWrapper\ErrorWrapper;
 use Clearbooks\Dilex\EventListener\CallbackWrapper\FinishWrapper;
+use Clearbooks\Dilex\EventListener\EventListenerApplier;
 use Clearbooks\Dilex\EventListener\EventListenerRecord;
 use Clearbooks\Dilex\EventListener\EventListenerRegistry;
 use Exception;
