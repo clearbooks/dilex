@@ -10,6 +10,7 @@ use Clearbooks\Dilex\EventListener\EventListenerRecord;
 use Clearbooks\Dilex\EventListener\EventListenerRegistry;
 use Clearbooks\Dilex\EventListener\ListenerRunner\AfterControllerListenerRunner;
 use Clearbooks\Dilex\EventListener\ListenerRunner\BeforeControllerListenerRunner;
+use Clearbooks\Dilex\EventListener\StringToResponseListener;
 use Exception;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -77,6 +78,11 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
     private $afterControllerListenerRunner;
 
     /**
+     * @var StringToResponseListener
+     */
+    private $stringToResponseListener;
+
+    /**
      * @var string|null
      */
     private $projectDirectory = null;
@@ -105,6 +111,7 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         $this->errorEventListenerWrapper = new ErrorWrapper( $this->containerProvider );
         $this->beforeControllerListenerRunner = new BeforeControllerListenerRunner( $this->containerProvider );
         $this->afterControllerListenerRunner = new AfterControllerListenerRunner( $this->containerProvider );
+        $this->stringToResponseListener = new StringToResponseListener();
     }
 
     public function setProjectDirectory( ?string $projectDirectory ): void
@@ -208,6 +215,13 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
     {
         $this->addBeforeControllerListenerRunner();
         $this->addAfterControllerListenerRunner();
+        $this->eventListenerRegistry->addEvent(
+                new EventListenerRecord(
+                        KernelEvents::VIEW,
+                        [ $this->stringToResponseListener, 'execute' ],
+                        -10
+                )
+        );
 
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->getContainer()->get( 'event_dispatcher' );
