@@ -24,7 +24,7 @@ class BeforeWrapper implements CallbackWrapper
         $this->callbackResolver = new CallbackClassResolver( $containerProvider );
     }
 
-    public function wrap( callable $callback ): callable
+    public function wrap( $callback ): callable
     {
         return function( RequestEvent $event ) use ( $callback ) {
             if ( !$event->isMasterRequest() ) {

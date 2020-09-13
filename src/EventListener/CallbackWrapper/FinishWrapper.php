@@ -23,7 +23,7 @@ class FinishWrapper implements CallbackWrapper
         $this->callbackResolver = new CallbackClassResolver( $containerProvider );
     }
 
-    public function wrap( callable $callback ): callable
+    public function wrap( $callback ): callable
     {
         return function( TerminateEvent $event ) use ( $callback ) {
             call_user_func(

@@ -2,6 +2,7 @@
 namespace Clearbooks\Dilex\EventListener;
 
 use Clearbooks\Dilex\ContainerProvider;
+use RuntimeException;
 
 class CallbackClassResolver
 {
@@ -10,24 +11,18 @@ class CallbackClassResolver
      */
     private $containerProvider;
 
-    /**
-     * @var StringCallbackTransformer
-     */
-    private $stringCallbackTransformer;
-
     public function __construct( ContainerProvider $containerProvider )
     {
         $this->containerProvider = $containerProvider;
-        $this->stringCallbackTransformer = new StringCallbackTransformer( $this->containerProvider );
     }
 
-    public function resolve( callable $callback ): callable
+    public function resolve( $callback ): callable
     {
-        if ( is_string( $callback ) ) {
-            $callback = $this->stringCallbackTransformer->transform( $callback );
-        }
-
         if ( !is_string( $callback ) && ( !is_array( $callback ) || !is_string( $callback[0] ) ) ) {
+            if ( !is_callable( $callback ) ) {
+                throw new RuntimeException( 'Invalid callback.' );
+            }
+
             return $callback;
         }
 
@@ -35,6 +30,14 @@ class CallbackClassResolver
             $callback[0] = $this->containerProvider->getContainer()->get( $callback[0] );
         }
         else {
+            if ( strpos( $callback, '::' ) !== false ) {
+                if ( !is_callable( $callback ) ) {
+                    throw new RuntimeException( 'Invalid callback.' );
+                }
+
+                return $callback;
+            }
+
             $callback = $this->containerProvider->getContainer()->get( $callback );
         }
 

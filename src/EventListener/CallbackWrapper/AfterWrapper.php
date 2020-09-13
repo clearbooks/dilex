@@ -25,7 +25,7 @@ class AfterWrapper implements CallbackWrapper
         $this->callbackResolver = new CallbackClassResolver( $containerProvider );
     }
 
-    public function wrap( callable $callback ): callable
+    public function wrap( $callback ): callable
     {
         return function( ResponseEvent $event ) use ( $callback ) {
             if ( !$event->isMasterRequest() ) {

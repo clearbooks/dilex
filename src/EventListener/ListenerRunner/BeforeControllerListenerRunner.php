@@ -45,7 +45,7 @@ class BeforeControllerListenerRunner
         foreach ( $callbacks as $callback ) {
             $result = call_user_func(
                     $this->callbackResolver->resolve( $callback ),
-                    $event->getRequest()
+                    $request
             );
 
             if ( $result instanceof Response ) {

@@ -24,7 +24,7 @@ class ErrorWrapper implements CallbackWrapper
         $this->callbackResolver = new CallbackClassResolver( $containerProvider );
     }
 
-    public function wrap( callable $callback ): callable
+    public function wrap( $callback ): callable
     {
         return function( ExceptionEvent $event ) use ( $callback ) {
             $exception = $event->getThrowable();

@@ -249,7 +249,7 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_PATCH );
     }
 
-    public function before( callable $callback, int $priority = 0 ): void
+    public function before( $callback, int $priority = 0 ): void
     {
         $this->eventListenerRegistry->addEvent(
                 new EventListenerRecord(
@@ -260,7 +260,7 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         );
     }
 
-    public function after( callable $callback, int $priority = 0 ): void
+    public function after( $callback, int $priority = 0 ): void
     {
         $this->eventListenerRegistry->addEvent(
                 new EventListenerRecord(
@@ -271,7 +271,7 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         );
     }
 
-    public function finish( callable $callback, int $priority = 0 ): void
+    public function finish( $callback, int $priority = 0 ): void
     {
         $this->eventListenerRegistry->addEvent(
                 new EventListenerRecord(
@@ -282,7 +282,7 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         );
     }
 
-    public function error( callable $callback, int $priority = -8 ): void
+    public function error( $callback, int $priority = -8 ): void
     {
         $this->eventListenerRegistry->addEvent(
                 new EventListenerRecord(

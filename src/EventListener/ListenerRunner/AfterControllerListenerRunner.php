@@ -46,7 +46,7 @@ class AfterControllerListenerRunner
         foreach ( $callbacks as $callback ) {
             $result = call_user_func(
                     $this->callbackResolver->resolve( $callback ),
-                    $event->getRequest(),
+                    $request,
                     $event->getResponse()
             );
 

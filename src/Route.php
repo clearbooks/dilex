@@ -13,20 +13,20 @@ class Route extends SymfonyRoute
         return $this->addRequirements( [ $key => $regex ] );
     }
 
-    private function addCallback( string $option, callable $callback ): void
+    private function addCallback( string $option, $callback ): void
     {
         $callbacks = (array)$this->getOption( $option );
         $callbacks[] = $callback;
         $this->setOption( $option, $callbacks );
     }
 
-    public function before( callable $callback ): self
+    public function before( $callback ): self
     {
         $this->addCallback( self::OPTION_BEFORE_CONTROLLER_LISTENERS, $callback );
         return $this;
     }
 
-    public function after( callable $callback ): self
+    public function after( $callback ): self
     {
         $this->addCallback( self::OPTION_AFTER_CONTROLLER_LISTENERS, $callback );
         return $this;
