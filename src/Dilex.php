@@ -106,7 +106,7 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
         $this->checkEndpoint( $endpoint );
 
         $route = new Route( $pattern );
-        $route->setDefault( '_controller', $endpoint . '::execute' );
+        $route->setDefault( '_controller', [ $endpoint, 'execute' ] );
         if ( $method ) {
             $route->setMethods( [ $method ] );
         }
@@ -115,7 +115,7 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
 
     private function createAndAddRoute( string $pattern, string $endpoint, string $method = null ): Route
     {
-        $route = $this->createRoute( $pattern, $endpoint );
+        $route = $this->createRoute( $pattern, $endpoint, $method );
         $this->routes[] = $route;
         return $route;
     }
@@ -123,7 +123,7 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
     private function initializeListeners(): void
     {
         /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->getContainer()->get( EventDispatcherInterface::class );
+        $eventDispatcher = $this->getContainer()->get( 'event_dispatcher' );
 
         foreach ( $this->beforeRequestListeners as [ $beforeRequestListener, $priority ] ) {
             $eventDispatcher->addListener(
@@ -213,6 +213,16 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
     public function after( callable $callback, int $priority = 0 ): void
     {
         $this->afterRequestListeners[] = [ $callback, $priority ];
+    }
+
+    public function finish( callable $callback, int $priority = 0 ): void
+    {
+        // TODO: Implement
+    }
+
+    public function error( callable $callback, int $priority = -8 ): void
+    {
+        // TODO: Implement
     }
 
     /**

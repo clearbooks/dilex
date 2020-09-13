@@ -25,11 +25,11 @@ class ApplicationTest extends TestCase
         parent::setUp();
 
         $this->error = null;
-        $this->app = new Dilex();
-        ApplicationBuilder::build( new MockContainer( [
-            EchoController::class => new EchoController(),
-            ErrorThrowingController::class => new ErrorThrowingController()
-        ] ), $this->app );
+        $container = new MockContainer( [
+                EchoController::class => new EchoController(),
+                ErrorThrowingController::class => new ErrorThrowingController()
+        ] );
+        $this->app = new Dilex( 'test', true, $container );
         $this->app->post(self::ECHO_ENDPOINT, EchoController::class);
         $this->app->post(self::ERROR_ENDPOINT, ErrorThrowingController::class);
 
