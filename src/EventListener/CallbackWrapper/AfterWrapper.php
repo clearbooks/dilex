@@ -1,7 +1,6 @@
 <?php
 namespace Clearbooks\Dilex\EventListener\CallbackWrapper;
 
-use Clearbooks\Dilex\CallbackClassResolver;
 use Clearbooks\Dilex\ContainerProvider;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;

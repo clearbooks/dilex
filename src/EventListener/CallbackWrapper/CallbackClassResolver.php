@@ -1,7 +1,7 @@
 <?php
-namespace Clearbooks\Dilex;
+namespace Clearbooks\Dilex\EventListener\CallbackWrapper;
 
-use Clearbooks\Dilex\EventListener\CallbackWrapper\StringCallbackTransformer;
+use Clearbooks\Dilex\ContainerProvider;
 
 class CallbackClassResolver
 {
