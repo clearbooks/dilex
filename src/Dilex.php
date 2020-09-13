@@ -1,25 +1,25 @@
 <?php
-
 namespace Clearbooks\Dilex;
 
+use Clearbooks\Dilex\EventListener\CallbackWrapper\AfterWrapper;
+use Clearbooks\Dilex\EventListener\CallbackWrapper\BeforeWrapper;
+use Clearbooks\Dilex\EventListener\CallbackWrapper\ErrorWrapper;
+use Clearbooks\Dilex\EventListener\CallbackWrapper\FinishWrapper;
+use Clearbooks\Dilex\EventListener\EventListenerRecord;
+use Clearbooks\Dilex\EventListener\EventListenerRegistry;
 use Exception;
-use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
-use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
-class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
+class Dilex extends Kernel implements RouteContainer, AddEventListeners
 {
     use MicroKernelTrait;
 
@@ -29,25 +29,52 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
     private $fallbackContainerInterface;
 
     /**
-     * @var array
+     * @var RouteRegistry
      */
-    private $routes = [];
+    private $routeRegistry;
 
     /**
-     * @var array
+     * @var ContainerProvider
      */
-    private $beforeRequestListeners = [];
+    private $containerProvider;
 
     /**
-     * @var array
+     * @var EventListenerRegistry
      */
-    private $afterRequestListeners = [];
+    private $eventListenerRegistry;
+
+    /**
+     * @var BeforeWrapper
+     */
+    private $beforeEventListenerWrapper;
+
+    /**
+     * @var AfterWrapper
+     */
+    private $afterEventListenerWrapper;
+
+    /**
+     * @var FinishWrapper
+     */
+    private $finishEventListenerWrapper;
+
+    /**
+     * @var ErrorWrapper
+     */
+    private $errorEventListenerWrapper;
 
     public function __construct( string $environment, bool $debug,
                                  ContainerInterface $fallbackContainerInterface = null )
     {
         parent::__construct( $environment, $debug );
         $this->fallbackContainerInterface = $fallbackContainerInterface;
+        $this->routeRegistry = new RouteRegistry();
+        $this->containerProvider = new ContainerProvider();
+        $this->eventListenerRegistry = new EventListenerRegistry();
+        $this->beforeEventListenerWrapper = new BeforeWrapper( $this->containerProvider );
+        $this->afterEventListenerWrapper = new AfterWrapper( $this->containerProvider );
+        $this->finishEventListenerWrapper = new FinishWrapper( $this->containerProvider );
+        $this->errorEventListenerWrapper = new ErrorWrapper( $this->containerProvider );
     }
 
     public function registerBundles(): array
@@ -64,26 +91,8 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
 
     protected function configureRoutes( RouteCollectionBuilder $routes ): void
     {
-        foreach ( $this->routes as $route ) {
+        foreach ( $this->routeRegistry->getRoutes() as $route ) {
             $routes->addRoute( $route );
-        }
-    }
-
-    private function checkEndpoint( string $endpoint ): void
-    {
-        if ( !in_array( Endpoint::class, class_implements( $endpoint ) ) ) {
-            throw new InvalidArgumentException(
-                    'Class ' . $endpoint . ' doesn\'t implement ' . Endpoint::class
-            );
-        }
-    }
-
-    private function checkBeforeRequestListener( string $beforeRequestListener ): void
-    {
-        if ( !in_array( Middleware::class, class_implements( $beforeRequestListener ) ) ) {
-            throw new InvalidArgumentException(
-                    'Class ' . $beforeRequestListener . ' doesn\'t implement ' . Middleware::class
-            );
         }
     }
 
@@ -101,128 +110,90 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
         }
     }
 
-    private function createRoute( string $pattern, string $endpoint, string $method = null ): Route
-    {
-        $this->checkEndpoint( $endpoint );
-
-        $route = new Route( $pattern );
-        $route->setDefault( '_controller', [ $endpoint, 'execute' ] );
-        if ( $method ) {
-            $route->setMethods( [ $method ] );
-        }
-        return $route;
-    }
-
-    private function createAndAddRoute( string $pattern, string $endpoint, string $method = null ): Route
-    {
-        $route = $this->createRoute( $pattern, $endpoint, $method );
-        $this->routes[] = $route;
-        return $route;
-    }
-
     private function initializeListeners(): void
     {
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->getContainer()->get( 'event_dispatcher' );
-
-        foreach ( $this->beforeRequestListeners as [ $beforeRequestListener, $priority ] ) {
-            $eventDispatcher->addListener(
-                    KernelEvents::REQUEST,
-                    function( RequestEvent $event ) use ( $beforeRequestListener ) {
-                        if ( !$event->isMasterRequest() ) {
-                            return;
-                        }
-
-                        /** @var Middleware $callback */
-                        $callback = $this->getContainer()->get( $beforeRequestListener );
-                        $result = $callback->execute( $event->getRequest() );
-                        if ( $result instanceof Response ) {
-                            $event->setResponse( $result );
-                        }
-                    },
-                    $priority
-            );
-        }
-
-        foreach ( $this->afterRequestListeners as [ $afterRequestListener, $priority ] ) {
-            $eventDispatcher->addListener(
-                    KernelEvents::RESPONSE,
-                    function( ResponseEvent $event ) use ( $afterRequestListener ) {
-                        if ( !$event->isMasterRequest() ) {
-                            return;
-                        }
-
-                        if ( is_string( $afterRequestListener ) && strpos( $afterRequestListener, '::' ) !== false ) {
-                            [ $class, $method ] = explode( '::', $afterRequestListener, 2 );
-                            $afterRequestListener = [ $this->getContainer()->get( $class ), $method ];
-                        }
-
-                        $result = call_user_func( $afterRequestListener, $event->getRequest(), $event->getResponse() );
-                        if ( $result instanceof Response ) {
-                            $event->setResponse( $result );
-                        } else if ( $result !== null ) {
-                            throw new RuntimeException( 'Invalid after middleware response.' );
-                        }
-                    },
-                    $priority
-            );
-        }
+        $this->eventListenerRegistry->registerEvents( $eventDispatcher );
     }
 
     public function match( string $pattern, string $endpoint ): Route
     {
-        return $this->createAndAddRoute( $pattern, $endpoint );
+        return $this->routeRegistry->addRoute( $pattern, $endpoint );
     }
 
     public function get( string $pattern, string $endpoint ): Route
     {
-        return $this->createAndAddRoute( $pattern, $endpoint, Request::METHOD_GET );
+        return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_GET );
     }
 
     public function post( string $pattern, string $endpoint ): Route
     {
-        return $this->createAndAddRoute( $pattern, $endpoint, Request::METHOD_POST );
+        return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_POST );
     }
 
     public function put( string $pattern, string $endpoint ): Route
     {
-        return $this->createAndAddRoute( $pattern, $endpoint, Request::METHOD_PUT );
+        return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_PUT );
     }
 
     public function delete( string $pattern, string $endpoint ): Route
     {
-        return $this->createAndAddRoute( $pattern, $endpoint, Request::METHOD_DELETE );
+        return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_DELETE );
     }
 
     public function options( string $pattern, string $endpoint ): Route
     {
-        return $this->createAndAddRoute( $pattern, $endpoint, Request::METHOD_OPTIONS );
+        return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_OPTIONS );
     }
 
     public function patch( string $pattern, string $endpoint ): Route
     {
-        return $this->createAndAddRoute( $pattern, $endpoint, Request::METHOD_PATCH );
+        return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_PATCH );
     }
 
-    public function before( string $beforeRequestListener, int $priority = 0 ): void
+    public function before( callable $callback, int $priority = 0 ): void
     {
-        $this->checkBeforeRequestListener( $beforeRequestListener );
-        $this->beforeRequestListeners[] = [ $beforeRequestListener, $priority ];
+        $this->eventListenerRegistry->addEvent(
+                new EventListenerRecord(
+                        KernelEvents::REQUEST,
+                        $this->beforeEventListenerWrapper->wrap( $callback ),
+                        $priority
+                )
+        );
     }
 
     public function after( callable $callback, int $priority = 0 ): void
     {
-        $this->afterRequestListeners[] = [ $callback, $priority ];
+        $this->eventListenerRegistry->addEvent(
+                new EventListenerRecord(
+                        KernelEvents::RESPONSE,
+                        $this->afterEventListenerWrapper->wrap( $callback ),
+                        $priority
+                )
+        );
     }
 
     public function finish( callable $callback, int $priority = 0 ): void
     {
-        // TODO: Implement
+        $this->eventListenerRegistry->addEvent(
+                new EventListenerRecord(
+                        KernelEvents::TERMINATE,
+                        $this->finishEventListenerWrapper->wrap( $callback ),
+                        $priority
+                )
+        );
     }
 
     public function error( callable $callback, int $priority = -8 ): void
     {
-        // TODO: Implement
+        $this->eventListenerRegistry->addEvent(
+                new EventListenerRecord(
+                        KernelEvents::EXCEPTION,
+                        $this->errorEventListenerWrapper->wrap( $callback ),
+                        $priority
+                )
+        );
     }
 
     /**
@@ -238,6 +209,7 @@ class Dilex extends Kernel implements RouteContainer, MiddlewareContainer
         }
 
         $this->boot();
+        $this->containerProvider->setContainer( $this->getContainer() );
         $this->initializeListeners();
         $response = $this->handle( $request );
         $response->send();
