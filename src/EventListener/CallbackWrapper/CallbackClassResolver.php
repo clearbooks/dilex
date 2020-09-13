@@ -27,7 +27,7 @@ class CallbackClassResolver
             $callback = $this->stringCallbackTransformer->transform( $callback );
         }
 
-        if ( !is_string( $callback ) && !is_array( $callback ) && !is_string( $callback[0] ) ) {
+        if ( !is_string( $callback ) && ( !is_array( $callback ) || !is_string( $callback[0] ) ) ) {
             return $callback;
         }
 
