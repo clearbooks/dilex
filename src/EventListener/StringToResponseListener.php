@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Clearbooks\Dilex\EventListener;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -6,7 +8,7 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
 
 class StringToResponseListener
 {
-    public function execute( ViewEvent $event )
+    public function execute( ViewEvent $event ): void
     {
         $response = $event->getControllerResult();
         if ( $response !== null
