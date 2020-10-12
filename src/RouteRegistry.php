@@ -1,7 +1,8 @@
 <?php
+declare(strict_types=1);
+
 namespace Clearbooks\Dilex;
 
-use Clearbooks\Dilex\EventListener\EventListenerRegistry;
 use InvalidArgumentException;
 
 class RouteRegistry

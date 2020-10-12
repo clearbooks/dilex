@@ -7,7 +7,7 @@ namespace Clearbooks\Dilex;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class ApplicationTest extends TestCase
+class DilexTest extends TestCase
 {
     private const TEST_PAYLOAD = [
         'test1' => 'value1',
@@ -17,7 +17,14 @@ class ApplicationTest extends TestCase
     private const ECHO_ENDPOINT = '/echo';
     private const ERROR_ENDPOINT = '/error';
 
+    /**
+     * @var null|\Throwable
+     */
     private $error;
+
+    /**
+     * @var Dilex
+     */
     private $app;
 
     public function setUp(): void
@@ -29,13 +36,20 @@ class ApplicationTest extends TestCase
                 EchoController::class => new EchoController(),
                 ErrorThrowingController::class => new ErrorThrowingController()
         ] );
-        $this->app = new Dilex( 'test', true, $container );
+        $this->app = new Dilex( 'test', false, $container );
         $this->app->post(self::ECHO_ENDPOINT, EchoController::class);
         $this->app->post(self::ERROR_ENDPOINT, ErrorThrowingController::class);
 
         $this->app->error(function ($e) {
             $this->error = $e;
         });
+    }
+
+    private function runAndGetResponse(Request $request): ?string
+    {
+        ob_start();
+        $this->app->run($request);
+        return ob_get_clean();
     }
 
     /**
@@ -47,9 +61,7 @@ class ApplicationTest extends TestCase
 
         $request = Request::create(self::ECHO_ENDPOINT, Request::METHOD_POST, [], [], [], [], $content);
 
-        ob_start();
-        $this->app->run($request);
-        $body = ob_get_clean();
+        $body = $this->runAndGetResponse($request);
 
         $this->assertEquals($content, $body);
         $this->assertNull($this->error);
@@ -64,11 +76,9 @@ class ApplicationTest extends TestCase
 
         $request = Request::create(self::ERROR_ENDPOINT, Request::METHOD_POST, [], [], [], [], $content);
 
-        ob_start();
-        $this->app->run($request);
-        $body = ob_get_clean();
+        $body = $this->runAndGetResponse($request);
 
         $this->assertNotEquals($content, $body);
-        $this->assertNotNull($this->error);
+        $this->assertEquals(new \RuntimeException('Test exception'), $this->error);
     }
 }
