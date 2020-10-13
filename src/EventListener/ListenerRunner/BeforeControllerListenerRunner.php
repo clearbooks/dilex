@@ -7,7 +7,7 @@ use Clearbooks\Dilex\Route;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class BeforeControllerListenerRunner
 {
@@ -31,7 +31,7 @@ class BeforeControllerListenerRunner
     {
         $container = $this->containerProvider->getContainer();
 
-        /** @var Router $router */
+        /** @var RouterInterface $router */
         $router = $container->get( 'router' );
 
         $request = $event->getRequest();
