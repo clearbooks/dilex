@@ -1,6 +1,6 @@
 {
     "name": "clearbooks/dilex",
-    "description": "Silex with enhanced DI",
+    "description": "Symfony with enhanced DI and a Silex-like interface",
     "type": "library",
     "require": {
         "php": ">=7.2",
