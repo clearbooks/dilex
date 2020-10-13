@@ -2,6 +2,9 @@
 namespace Clearbooks\Dilex\EventListener;
 
 use Clearbooks\Dilex\ContainerProvider;
+use Clearbooks\Dilex\Endpoint;
+use Clearbooks\Dilex\Middleware;
+use Clearbooks\Dilex\MiddlewareCallbackResolver;
 use RuntimeException;
 
 class CallbackClassResolver
@@ -11,9 +14,15 @@ class CallbackClassResolver
      */
     private $containerProvider;
 
+    /**
+     * @var MiddlewareCallbackResolver
+     */
+    private $middlewareCallbackResolver;
+
     public function __construct( ContainerProvider $containerProvider )
     {
         $this->containerProvider = $containerProvider;
+        $this->middlewareCallbackResolver = new MiddlewareCallbackResolver();
     }
 
     public function resolve( $callback ): callable
@@ -24,6 +33,10 @@ class CallbackClassResolver
             }
 
             return $callback;
+        }
+
+        if ( is_string( $callback ) ) {
+            $callback = $this->middlewareCallbackResolver->resolve( $callback );
         }
 
         if ( is_array( $callback ) ) {

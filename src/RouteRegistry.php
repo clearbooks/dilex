@@ -8,24 +8,24 @@ use InvalidArgumentException;
 class RouteRegistry
 {
     /**
+     * @var EndpointCallbackResolver
+     */
+    private $endpointCallbackResolver;
+
+    /**
      * @var Route[]
      */
     private $routes = [];
 
-    private function checkEndpoint( string $endpoint ): void
+    public function __construct()
     {
-        if ( !in_array( Endpoint::class, class_implements( $endpoint ) ) ) {
-            throw new InvalidArgumentException(
-                    'Class ' . $endpoint . ' doesn\'t implement ' . Endpoint::class
-            );
-        }
+        $this->endpointCallbackResolver = new EndpointCallbackResolver();
     }
 
     private function createRoute( string $pattern, string $endpoint, string $method = null ): Route
     {
-        $this->checkEndpoint( $endpoint );
         $route = new Route( $pattern );
-        $route->setDefault( '_controller', [ $endpoint, 'execute' ] );
+        $route->setDefault( '_controller', $this->endpointCallbackResolver->resolve( $endpoint ) );
         if ( $method ) {
             $route->setMethods( [ $method ] );
         }

@@ -31,17 +31,6 @@ class RouteRegistryTest extends TestCase
     /**
      * @test
      */
-    public function WhenTryingToAddRoute_AndClassDoesNotImplementEndpoint_ExpectException()
-    {
-        $invalidEndpoint = InvalidEndpoint::class;
-        $this->expectException( InvalidArgumentException::class );
-        $this->expectExceptionMessage('Class ' . $invalidEndpoint . ' doesn\'t implement ' . Endpoint::class);
-        $this->routeRegistry->addRoute( "/test", $invalidEndpoint );
-    }
-
-    /**
-     * @test
-     */
     public function WhenAddingRoute_ExpectRouteCorrectlyConfigured()
     {
         $routePath = '/test';

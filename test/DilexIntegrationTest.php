@@ -321,4 +321,21 @@ class DilexIntegrationTest extends TestCase
 
         $this->assertEquals(3, $counter->get());
     }
+
+    /**
+     * @test
+     */
+    public function GivenMiddleWareCallback_WhenAfterCallbackIsSet_ExpectNoError(): void
+    {
+        $this->expectNotToPerformAssertions();
+        $this->mockContainer->setMapping(EndpointDummy::class, new EndpointDummy());
+        $this->mockContainer->setMapping(MiddlewareDummy::class, new MiddlewareDummy());
+        $this->app->post(self::ECHO_ENDPOINT, EndpointDummy::class);
+        $this->app->after(MiddlewareDummy::class);
+
+        $content = json_encode(self::TEST_PAYLOAD);
+        $request = Request::create(self::ECHO_ENDPOINT, Request::METHOD_POST, [], [], [], [], $content);
+
+        $this->runAndGetResponse($request);
+    }
 }
