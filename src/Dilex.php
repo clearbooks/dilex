@@ -116,17 +116,17 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
 
     public function setProjectDirectory( ?string $projectDirectory ): void
     {
-        $this->projectDirectory = rtrim( $projectDirectory, '/' );
+        $this->projectDirectory = $projectDirectory === null ? null : rtrim( $projectDirectory, '/' );
     }
 
     public function setCacheDirectory( ?string $cacheDirectory ): void
     {
-        $this->cacheDirectory = '/' . trim( $cacheDirectory, '/' ) . '/';
+        $this->cacheDirectory = $cacheDirectory === null ? null : ( '/' . trim( $cacheDirectory, '/' ) . '/' );
     }
 
     public function setLogDirectory( ?string $logDirectory ): void
     {
-        $this->logDirectory = '/' . trim( $logDirectory, '/' );
+        $this->logDirectory = $logDirectory === null ? null : ( '/' . trim( $logDirectory, '/' ) );
     }
 
     public function getProjectDir()
