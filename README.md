@@ -2,29 +2,18 @@
 
 ## Rationale
 
-Dilex is an extension of Silex to provide ContainerInterop compatibility.
-While other libraries exist to accomplish similar goals most of them still use Pimple as a service locator which is something Dilex goes to great pains to avoid.
-
-## Differences to Silex
-
-
-Dilex consists of replacements for Silex's controller & callback resolvers, so affects the usage of ```before``` and endpoint methods such as ```get```.
-
-Instead of being handled by callables ```before``` and ```get``` now require you to pass in a class implementing ```Middleware``` and ```Endpoint``` respectively.
+Dilex is an extension of Symfony to provide custom ContainerInterop compatibility and a Silex-like interface. You can specify a custom fallback container, which will be used when an entry cannot be resolved by Symfony's container.
 
 ## Usage
 
-To apply the Dilex extensions to an instance of ```Dilex``` object (which extends Silex ```Application```) you use the provided ```ApplicationBuilder``` which requires an ```Application``` and a ```ContainerInterop``` compliant dependency injection container
-
-(Dilex allows you to use either the Silex ```Application``` class or the ```Dilex`` class with the ApplicationBuilder)
-
 ```php
-$application = new \Clearbooks\Dilex\Dilex;
+$environment = 'dev';
+$debug = true;
 $container = new DependencyInjectionContainer(); // replace with your real DI initialisation code
-\Clearbooks\Dilex\ApplicationBuilder::build( $container, $application );
+$application = new \Clearbooks\Dilex\Dilex( $environment, $debug, $container );
 ```
 
-Once the application has been decorated you can create ```Endpoint``` classes to be executed for a given API route, here's a simple example.
+Once the application has been instantiated you can create ```Endpoint``` classes to be executed for a given API route. Here's a simple example.
 
 ```php
 namespace Your\Organisation\Endpoint;
@@ -44,7 +33,7 @@ class ExampleEndpoint implements Endpoint
 
 While the above example has no constructor the main benefit of Dilex is that the endpoint will be instantiated through your DI container of choice, so you can inject dependencies into the constructor of the Endpoint per your DI container documentation.
 
-You can then associate your ```Endpoint``` implementation with an API route using Silex's ```get``` method.
+You can then associate your ```Endpoint``` implementation with an API route using Dilex's ```get``` method.
 
 ```php
 use Your\Organisation\Endpoint\ExampleEndpoint;
@@ -55,8 +44,9 @@ $application->get( '/', ExampleEndpoint::class );
 
 ```
 
-
-
 ## Credits
 
 ![stamp_small](https://cloud.githubusercontent.com/assets/980959/9278343/27074a4c-42a8-11e5-8262-89c1d6f2217e.png)
+
+## Disclaimer
+THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
