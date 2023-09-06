@@ -11,8 +11,23 @@ class ErrorCallback
 {
     use CallHistory;
 
+    /**
+     * @var mixed
+     */
+    private $result = null;
+
     public function __invoke(Throwable $throwable, int $code, Request $request)
     {
         $this->callHistory[] = [$throwable, $code, $request];
+
+        return $this->result;
+    }
+
+    /**
+     * @param mixed $result
+     */
+    public function setResult( $result ): void
+    {
+        $this->result = $result;
     }
 }
