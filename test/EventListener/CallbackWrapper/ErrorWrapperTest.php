@@ -8,6 +8,7 @@ use Clearbooks\Dilex\MockContainer;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -42,6 +43,22 @@ class ErrorWrapperTest extends TestCase
                 HttpKernelInterface::MASTER_REQUEST,
                 $exception ?? new Exception()
         );
+    }
+
+    /**
+     * @test
+     */
+    public function WhenCallbackReturnsResponse_ExpectResponseSetOnEvent()
+    {
+        $event = $this->createTestExceptionEvent();
+        $callback = ErrorCallback::class;
+        $callbackInstance = new ErrorCallback();
+        $response = new Response('test');
+        $callbackInstance->setResult($response);
+        $this->mockContainer->setMapping($callback, $callbackInstance);
+        $callable = $this->errorWrapper->wrap($callback);
+        $callable($event);
+        $this->assertSame($response, $event->getResponse());
     }
 
     /**
