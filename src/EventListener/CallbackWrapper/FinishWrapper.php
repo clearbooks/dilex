@@ -1,28 +1,25 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Clearbooks\Dilex\EventListener\CallbackWrapper;
 
 use Clearbooks\Dilex\ContainerProvider;
 use Clearbooks\Dilex\EventListener\CallbackClassResolver;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 
+use function call_user_func;
+
 class FinishWrapper implements CallbackWrapper
 {
-    /**
-     * @var ContainerProvider
-     */
-    private $containerProvider;
-
-    /**
-     * @var CallbackClassResolver
-     */
-    private $callbackResolver;
+    private CallbackClassResolver $callbackResolver;
 
     public function __construct( ContainerProvider $containerProvider )
     {
-        $this->containerProvider = $containerProvider;
         $this->callbackResolver = new CallbackClassResolver( $containerProvider );
     }
 
+    #[\Override]
     public function wrap( $callback ): callable
     {
         return function( TerminateEvent $event ) use ( $callback ) {

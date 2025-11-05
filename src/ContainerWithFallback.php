@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Clearbooks\Dilex;
 
 use Psr\Container\ContainerInterface;
@@ -6,17 +9,16 @@ use Symfony\Component\DependencyInjection\Container;
 
 class ContainerWithFallback extends Container
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $fallbackContainer;
+    private ?ContainerInterface $fallbackContainer = null;
 
-    public function setFallbackContainer( ContainerInterface $fallbackContainer ): void
-    {
+    public function setFallbackContainer(
+        ContainerInterface $fallbackContainer
+    ): void {
         $this->fallbackContainer = $fallbackContainer;
     }
 
-    public function has( $id )
+    #[\Override]
+    public function has( string $id ): bool
     {
         if ( parent::has( $id ) ) {
             return true;
@@ -29,7 +31,8 @@ class ContainerWithFallback extends Container
         return $this->fallbackContainer->has( $id );
     }
 
-    public function get( $id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE )
+    #[\Override]
+    public function get( string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE ): ?object
     {
         if ( !$this->fallbackContainer || parent::has( $id ) ) {
             return parent::get( $id );

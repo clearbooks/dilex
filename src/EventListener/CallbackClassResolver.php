@@ -1,27 +1,26 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Clearbooks\Dilex\EventListener;
 
 use Clearbooks\Dilex\ContainerProvider;
-use Clearbooks\Dilex\Endpoint;
-use Clearbooks\Dilex\Middleware;
 use Clearbooks\Dilex\MiddlewareCallbackResolver;
 use RuntimeException;
 
+use function is_string;
+use function is_array;
+use function is_callable;
+use function str_contains;
+
+
 class CallbackClassResolver
 {
-    /**
-     * @var ContainerProvider
-     */
-    private $containerProvider;
+    private MiddlewareCallbackResolver $middlewareCallbackResolver;
 
-    /**
-     * @var MiddlewareCallbackResolver
-     */
-    private $middlewareCallbackResolver;
-
-    public function __construct( ContainerProvider $containerProvider )
-    {
-        $this->containerProvider = $containerProvider;
+    public function __construct(
+        private readonly ContainerProvider $containerProvider
+    ) {
         $this->middlewareCallbackResolver = new MiddlewareCallbackResolver();
     }
 
@@ -43,7 +42,7 @@ class CallbackClassResolver
             $callback[0] = $this->containerProvider->getContainer()->get( $callback[0] );
         }
         else {
-            if ( strpos( $callback, '::' ) !== false ) {
+            if (str_contains($callback, '::')) {
                 if ( !is_callable( $callback ) ) {
                     throw new RuntimeException( 'Invalid callback.' );
                 }

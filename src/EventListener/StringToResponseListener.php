@@ -1,10 +1,15 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Clearbooks\Dilex\EventListener;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
+
+use function is_array;
+use function is_object;
+use function method_exists;
 
 class StringToResponseListener
 {

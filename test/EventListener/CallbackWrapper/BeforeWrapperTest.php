@@ -6,11 +6,9 @@ namespace Clearbooks\Dilex\EventListener\CallbackWrapper;
 use Clearbooks\Dilex\ContainerProvider;
 use Clearbooks\Dilex\MockContainer;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class BeforeWrapperTest extends TestCase
@@ -34,7 +32,7 @@ class BeforeWrapperTest extends TestCase
         $this->beforeWrapper = new BeforeWrapper($containerProvider);
     }
 
-    private function createTestRequestEvent(int $requestType = HttpKernelInterface::MASTER_REQUEST): RequestEvent
+    private function createTestRequestEvent(int $requestType = HttpKernelInterface::MAIN_REQUEST): RequestEvent
     {
         return new RequestEvent(
                 $this->createMock(HttpKernelInterface::class),

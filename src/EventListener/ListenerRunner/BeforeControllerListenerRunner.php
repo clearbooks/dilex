@@ -1,29 +1,26 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Clearbooks\Dilex\EventListener\ListenerRunner;
 
 use Clearbooks\Dilex\ContainerProvider;
 use Clearbooks\Dilex\EventListener\CallbackClassResolver;
-use Clearbooks\Dilex\Route;
+use Clearbooks\Dilex\RouteApplier;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\RouterInterface;
 
+use function call_user_func;
+
 class BeforeControllerListenerRunner
 {
-    /**
-     * @var ContainerProvider
-     */
-    private $containerProvider;
+    private CallbackClassResolver $callbackResolver;
 
-    /**
-     * @var CallbackClassResolver
-     */
-    private $callbackResolver;
-
-    public function __construct( ContainerProvider $containerProvider )
-    {
-        $this->containerProvider = $containerProvider;
+    public function __construct(
+        private readonly ContainerProvider $containerProvider
+    ) {
         $this->callbackResolver = new CallbackClassResolver( $containerProvider );
     }
 
@@ -36,12 +33,16 @@ class BeforeControllerListenerRunner
 
         $request = $event->getRequest();
         $routeName = $request->attributes->get('_route');
+        if ($routeName === null) {
+            return;
+        }
+
         $route = $router->getRouteCollection()->get( $routeName );
         if ( !$route ) {
             return;
         }
 
-        $callbacks = (array)$route->getOption( Route::OPTION_BEFORE_CONTROLLER_LISTENERS );
+        $callbacks = (array)$route->getOption( RouteApplier::OPTION_BEFORE_CONTROLLER_LISTENERS );
         foreach ( $callbacks as $callback ) {
             $result = call_user_func(
                     $this->callbackResolver->resolve( $callback ),

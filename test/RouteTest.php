@@ -15,7 +15,7 @@ class RouteTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->route = new Route('/test');
+        $this->route = new Route('/test', '');
     }
 
     /**
@@ -24,7 +24,7 @@ class RouteTest extends TestCase
     public function WhenCallingAssert_ExpectRequirementAdded()
     {
         $this->route->assert('id', 'test');
-        $this->assertEquals('test', $this->route->getRequirement('id'));
+        $this->assertEquals('test', $this->route->getRequirements()['id']);
     }
 
     /**
@@ -36,14 +36,14 @@ class RouteTest extends TestCase
         $this->route->before($testCallback);
         $this->assertEquals(
                 [$testCallback],
-                $this->route->getOption(Route::OPTION_BEFORE_CONTROLLER_LISTENERS)
+                $this->route->getBeforeCallbacks()
         );
 
         $testCallback2 = [self::class, 'tearDown'];
         $this->route->before($testCallback2);
         $this->assertEquals(
                 [$testCallback, $testCallback2],
-                $this->route->getOption(Route::OPTION_BEFORE_CONTROLLER_LISTENERS)
+                $this->route->getBeforeCallbacks()
         );
     }
 
@@ -56,14 +56,14 @@ class RouteTest extends TestCase
         $this->route->after($testCallback);
         $this->assertEquals(
                 [$testCallback],
-                $this->route->getOption(Route::OPTION_AFTER_CONTROLLER_LISTENERS)
+                $this->route->getAfterCallbacks()
         );
 
         $testCallback2 = [self::class, 'tearDown'];
         $this->route->after($testCallback2);
         $this->assertEquals(
                 [$testCallback, $testCallback2],
-                $this->route->getOption(Route::OPTION_AFTER_CONTROLLER_LISTENERS)
+                $this->route->getAfterCallbacks()
         );
     }
 }

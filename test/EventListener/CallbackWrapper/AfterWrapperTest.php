@@ -33,7 +33,7 @@ class AfterWrapperTest extends TestCase
         $this->afterWrapper = new AfterWrapper($containerProvider);
     }
 
-    private function createTestResponseEvent(int $requestType = HttpKernelInterface::MASTER_REQUEST): ResponseEvent
+    private function createTestResponseEvent(int $requestType = HttpKernelInterface::MAIN_REQUEST): ResponseEvent
     {
         return new ResponseEvent(
                 $this->createMock(HttpKernelInterface::class),

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Clearbooks\Dilex;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -38,7 +37,7 @@ class RouteRegistryTest extends TestCase
         $method = Request::METHOD_POST;
         $route = $this->routeRegistry->addRoute( $routePath, $controller, $method );
         $this->assertEquals( $routePath, $route->getPath() );
-        $this->assertEquals( [ $controller, 'execute' ], $route->getDefault('_controller') );
+        $this->assertEquals( [ $controller, 'execute' ], $route->getController() );
         $this->assertEquals( [ $method ], $route->getMethods() );
     }
 

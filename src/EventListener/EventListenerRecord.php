@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Clearbooks\Dilex\EventListener;
@@ -6,25 +7,16 @@ namespace Clearbooks\Dilex\EventListener;
 class EventListenerRecord
 {
     /**
-     * @var string
-     */
-    private $eventType;
-
-    /**
-     * @var callback
+     * @var callable
      */
     private $callback;
 
-    /**
-     * @var int
-     */
-    private $priority;
-
-    public function __construct( string $eventType, callable $callback, int $priority )
-    {
-        $this->eventType = $eventType;
+    public function __construct(
+        private readonly string $eventType,
+        callable $callback,
+        private readonly int $priority
+    ) {
         $this->callback = $callback;
-        $this->priority = $priority;
     }
 
     public function getEventType(): string

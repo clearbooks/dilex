@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Clearbooks\Dilex\EventListener;
@@ -10,7 +11,7 @@ class EventListenerRegistry
     /**
      * @var EventListenerRecord[]
      */
-    private $listeners = [];
+    private array $listeners = [];
 
     public function addEvent( EventListenerRecord $record ): void
     {
