@@ -36,7 +36,7 @@ class ErrorWrapperTest extends TestCase
         $this->errorWrapper = new ErrorWrapper($containerProvider);
     }
 
-    private function createTestExceptionEvent(Throwable $exception = null): ExceptionEvent
+    private function createTestExceptionEvent(?Throwable $exception = null): ExceptionEvent
     {
         return new ExceptionEvent(
                 $this->createMock(HttpKernelInterface::class),
