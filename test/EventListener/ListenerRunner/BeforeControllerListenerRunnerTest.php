@@ -8,6 +8,7 @@ use Clearbooks\Dilex\EventListener\CallbackWrapper\BeforeCallback;
 use Clearbooks\Dilex\MockContainer;
 use Clearbooks\Dilex\Route;
 use Clearbooks\Dilex\RouteApplier;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -84,9 +85,7 @@ class BeforeControllerListenerRunnerTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteDoesNotExist_ExpectNoError()
     {
         $this->expectNotToPerformAssertions();
@@ -95,9 +94,7 @@ class BeforeControllerListenerRunnerTest extends TestCase
         $this->beforeControllerListenerRunner->execute($event);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteExist_ButNoBeforeControllerListeners_ExpectNoError()
     {
         $this->expectNotToPerformAssertions();
@@ -108,9 +105,7 @@ class BeforeControllerListenerRunnerTest extends TestCase
         $this->beforeControllerListenerRunner->execute($event);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteExistWithBeforeControllerListener_ExpectListenerCalledWithCorrectParameters()
     {
         $callback = BeforeCallback::class;
@@ -127,9 +122,7 @@ class BeforeControllerListenerRunnerTest extends TestCase
         $this->assertSame([$event->getRequest()], $callbackInstance->getCallHistory());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteExistWithBeforeControllerListener_WhenCallbackReturnsNotAResponseOrNull_ExpectException()
     {
         $this->expectException(RuntimeException::class);
@@ -148,9 +141,7 @@ class BeforeControllerListenerRunnerTest extends TestCase
         $this->beforeControllerListenerRunner->execute($event);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteExistWithBeforeControllerListener_WhenCallbackReturnsResponse_ExpectResponseSetOnEvent()
     {
         $callback = BeforeCallback::class;
@@ -169,9 +160,7 @@ class BeforeControllerListenerRunnerTest extends TestCase
         $this->assertSame($response, $event->getResponse());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteExistWithMultipleBeforeControllerListeners_ExpectListenerCalledWithCorrectParametersForEachListener()
     {
         $callback = BeforeCallback::class;

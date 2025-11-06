@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Clearbooks\Dilex;
 
 use Clearbooks\Dilex\EventListener\CallbackWrapper\AfterCallback;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class MiddlewareCallbackResolverTest extends TestCase
@@ -19,9 +20,7 @@ class MiddlewareCallbackResolverTest extends TestCase
         $this->middlewareCallbackResolver = new MiddlewareCallbackResolver();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallbackIsNotString_ReturnSameCallback()
     {
         $callback = new \stdClass();
@@ -29,9 +28,7 @@ class MiddlewareCallbackResolverTest extends TestCase
         $this->assertSame($callback, $newCallback);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallbackIsStringButNotAClass_ReturnSameCallback()
     {
         $callback = 'hello';
@@ -39,9 +36,7 @@ class MiddlewareCallbackResolverTest extends TestCase
         $this->assertSame($callback, $newCallback);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallbackIsString_RefersToAClass_ButDoesNotImplementMiddleware_ReturnSameCallback()
     {
         $callback = AfterCallback::class;
@@ -49,9 +44,7 @@ class MiddlewareCallbackResolverTest extends TestCase
         $this->assertSame($callback, $newCallback);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallbackIsString_RefersToAClass_AndImplementsMiddleware_ReturnArrayWithExecuteMethodSpecified()
     {
         $callback = MiddlewareDummy::class;

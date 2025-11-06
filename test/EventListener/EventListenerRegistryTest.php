@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Clearbooks\Dilex\EventListener;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -27,18 +28,14 @@ class EventListenerRegistryTest extends TestCase
         $this->eventDispatcherInterfaceSpy = $this->createMock(EventDispatcherInterface::class);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenNoEventsAdded_WhenCallingRegisterEvents_ExpectEventDispatcherNotCalled()
     {
         $this->eventDispatcherInterfaceSpy->expects($this->never())->method('addListener');
         $this->eventListenerRegistry->registerEvents($this->eventDispatcherInterfaceSpy);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenSomeEventsAdded_WhenCallingRegisterEvents_ExpectEventDispatcherCalledForEachEvent()
     {
         $event1 = new EventListenerRecord(KernelEvents::REQUEST, [$this, 'setUp'], 1);
@@ -47,19 +44,27 @@ class EventListenerRegistryTest extends TestCase
         $event2 = new EventListenerRecord(KernelEvents::RESPONSE, [$this, 'count'], 2);
         $this->eventListenerRegistry->addEvent($event2);
 
-        $this->eventDispatcherInterfaceSpy->expects($this->exactly(2))->method('addListener')->withConsecutive(
-                [
+        $this->eventDispatcherInterfaceSpy->expects($matcher = $this->exactly(2))->method('addListener')->willReturnCallback(function (...$x) use ($matcher, $event1, $event2) {
+            match ($matcher->numberOfInvocations()) {
+                1 => self::assertEquals(
+                    [
                         $event1->getEventType(),
                         $event1->getCallback(),
                         $event1->getPriority()
-                ],
-
-                [
+                    ],
+                    $x
+                ),
+                2 => self::assertEquals(
+                    [
                         $event2->getEventType(),
                         $event2->getCallback(),
                         $event2->getPriority()
-                ]
-        );
+                    ],
+                    $x
+                )
+            };
+        });
+
         $this->eventListenerRegistry->registerEvents($this->eventDispatcherInterfaceSpy);
     }
 }

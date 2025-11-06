@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Clearbooks\Dilex;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -19,17 +20,13 @@ class RouteRegistryTest extends TestCase
         $this->routeRegistry = new RouteRegistry();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenNoRoutes_WhenCallingGetRoutes_ExpectEmptyArray()
     {
         $this->assertEquals( [], $this->routeRegistry->getRoutes() );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenAddingRoute_ExpectRouteCorrectlyConfigured()
     {
         $routePath = '/test';
@@ -41,9 +38,7 @@ class RouteRegistryTest extends TestCase
         $this->assertEquals( [ $method ], $route->getMethods() );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteAdded_WhenCallingGetRoutes_ExpectRouteReturned()
     {
         $routePath = '/test';

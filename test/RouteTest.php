@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Clearbooks\Dilex;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class RouteTest extends TestCase
@@ -18,18 +19,14 @@ class RouteTest extends TestCase
         $this->route = new Route('/test', '');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallingAssert_ExpectRequirementAdded()
     {
         $this->route->assert('id', 'test');
         $this->assertEquals('test', $this->route->getRequirements()['id']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallingBefore_ExpectBeforeControllerListenersAdded()
     {
         $testCallback = [self::class, 'setUp'];
@@ -47,9 +44,7 @@ class RouteTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallingAfter_ExpectAfterControllerListenersAdded()
     {
         $testCallback = [self::class, 'setUp'];

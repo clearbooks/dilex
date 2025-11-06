@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Clearbooks\Dilex;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class ContainerWithFallbackTest extends TestCase
@@ -18,9 +19,7 @@ class ContainerWithFallbackTest extends TestCase
         $this->containerWithFallback = new ContainerWithFallback();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenHasFallbackContainer_WhenCallingHasAndFallbackContainerHasItem_ExpectTrue()
     {
         $fallbackContainer = new MockContainer([Endpoint::class => new EndpointDummy()]);
@@ -28,9 +27,7 @@ class ContainerWithFallbackTest extends TestCase
         $this->assertTrue($this->containerWithFallback->has(Endpoint::class));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenHasFallbackContainer_WhenCallingGetAndFallbackContainerHasItem_ExpectItemReturned()
     {
         $endpoint = new EndpointDummy();

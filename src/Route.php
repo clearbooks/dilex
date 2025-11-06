@@ -79,6 +79,6 @@ class Route
 
         sort($methods);
 
-        return "__dilex_route_{$this->getPath()}_" . implode('_', $methods);
+        return implode('_', [...$methods, $this->getPath()]);
     }
 }

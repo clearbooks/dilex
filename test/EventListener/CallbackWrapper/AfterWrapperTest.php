@@ -5,6 +5,7 @@ namespace Clearbooks\Dilex\EventListener\CallbackWrapper;
 
 use Clearbooks\Dilex\ContainerProvider;
 use Clearbooks\Dilex\MockContainer;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,9 +44,7 @@ class AfterWrapperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallbackReturnsNotAResponseOrNull_ExpectException()
     {
         $this->expectException(RuntimeException::class);
@@ -60,9 +59,7 @@ class AfterWrapperTest extends TestCase
         $callable($event);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallbackReturnsResponse_ExpectResponseSetOnEvent()
     {
         $event = $this->createTestResponseEvent();
@@ -76,9 +73,7 @@ class AfterWrapperTest extends TestCase
         $this->assertSame($response, $event->getResponse());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCalled_ExpectCallbackCalledWithCorrectParameters()
     {
         $event = $this->createTestResponseEvent();
@@ -90,9 +85,7 @@ class AfterWrapperTest extends TestCase
         $this->assertSame([[$event->getRequest(), $event->getResponse()]], $callbackInstance->getCallHistory());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallbackReturnsNull_ExpectOriginalResponseNotChanged()
     {
         $event = $this->createTestResponseEvent();
@@ -105,9 +98,7 @@ class AfterWrapperTest extends TestCase
         $this->assertSame($originalResponse, $event->getResponse());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenEventIsNotMasterRequest_ExpectNothingCalledOrChanged()
     {
         $event = $this->createTestResponseEvent(HttpKernelInterface::SUB_REQUEST);

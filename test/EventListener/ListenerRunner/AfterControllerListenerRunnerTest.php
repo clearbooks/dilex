@@ -8,6 +8,7 @@ use Clearbooks\Dilex\EventListener\CallbackWrapper\AfterCallback;
 use Clearbooks\Dilex\MockContainer;
 use Clearbooks\Dilex\Route;
 use Clearbooks\Dilex\RouteApplier;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -85,9 +86,7 @@ class AfterControllerListenerRunnerTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteDoesNotExist_ExpectNoError()
     {
         $this->expectNotToPerformAssertions();
@@ -96,9 +95,7 @@ class AfterControllerListenerRunnerTest extends TestCase
         $this->afterControllerListenerRunner->execute($event);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteExist_ButNoAfterControllerListeners_ExpectNoError()
     {
         $this->expectNotToPerformAssertions();
@@ -108,9 +105,7 @@ class AfterControllerListenerRunnerTest extends TestCase
         $this->afterControllerListenerRunner->execute($event);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteExistWithAfterControllerListener_ExpectListenerCalledWithCorrectParameters()
     {
         $callback = AfterCallback::class;
@@ -127,9 +122,7 @@ class AfterControllerListenerRunnerTest extends TestCase
         $this->assertSame([[$event->getRequest(), $event->getResponse()]], $callbackInstance->getCallHistory());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteExistWithAfterControllerListener_WhenCallbackReturnsNotAResponseOrNull_ExpectException()
     {
         $this->expectException(RuntimeException::class);
@@ -148,9 +141,7 @@ class AfterControllerListenerRunnerTest extends TestCase
         $this->afterControllerListenerRunner->execute($event);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteExistWithAfterControllerListener_WhenCallbackReturnsResponse_ExpectResponseSetOnEvent()
     {
         $callback = AfterCallback::class;
@@ -169,9 +160,7 @@ class AfterControllerListenerRunnerTest extends TestCase
         $this->assertSame($response, $event->getResponse());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenRouteExistWithMultipleAfterControllerListeners_ExpectListenerCalledWithCorrectParametersForEachListener()
     {
         $callback = AfterCallback::class;

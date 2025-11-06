@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Clearbooks\Dilex\EventListener;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,9 +35,7 @@ class StringToResponseListenerTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenNullControllerResult_ExpectResponseUnchanged()
     {
         $event = $this->createViewEventWithControllerResult(null);
@@ -44,9 +43,7 @@ class StringToResponseListenerTest extends TestCase
         $this->assertFalse($event->hasResponse());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenArrayControllerResult_ExpectResponseUnchanged()
     {
         $event = $this->createViewEventWithControllerResult([]);
@@ -54,9 +51,7 @@ class StringToResponseListenerTest extends TestCase
         $this->assertFalse($event->hasResponse());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenResponseTypeControllerResult_ExpectResponseUnchanged()
     {
         $event = $this->createViewEventWithControllerResult(new Response());
@@ -64,9 +59,7 @@ class StringToResponseListenerTest extends TestCase
         $this->assertFalse($event->hasResponse());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenObjectTypeControllerResult_WithoutToStringMethod_ExpectResponseUnchanged()
     {
         $event = $this->createViewEventWithControllerResult(new \stdClass());
@@ -74,9 +67,7 @@ class StringToResponseListenerTest extends TestCase
         $this->assertFalse($event->hasResponse());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenStringControllerResult_ExpectResponseSet()
     {
         $result = "test";
@@ -85,9 +76,7 @@ class StringToResponseListenerTest extends TestCase
         $this->assertEquals(new Response($result), $event->getResponse());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenObjectTypeControllerResult_WithToStringMethod_ExpectResponseUnchanged()
     {
         $result = new TestResultWithToStringMethod();
