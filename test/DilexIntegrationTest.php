@@ -4,11 +4,13 @@ declare(strict_types=1);
 namespace Clearbooks\Dilex;
 
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
+use function restore_exception_handler;
 
 class DilexIntegrationTest extends TestCase
 {
@@ -57,6 +59,7 @@ class DilexIntegrationTest extends TestCase
         $this->app->shutdown();
         $fileSystem = new Filesystem();
         $fileSystem->remove( $this->app->getCacheDir() );
+        restore_exception_handler();
     }
 
     private function runAndGetResponse(Request $request): ?string
@@ -66,9 +69,7 @@ class DilexIntegrationTest extends TestCase
         return ob_get_clean();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenApplicationWithController_HandlesGetRequest(): void
     {
         $this->mockContainer->setMapping(EchoController::class, new EchoController());
@@ -83,9 +84,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertNull($this->error);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenApplicationWithController_HandlesPostRequest(): void
     {
         $this->mockContainer->setMapping(EchoController::class, new EchoController());
@@ -100,9 +99,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertNull($this->error);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenApplicationWithController_HandlesPutRequest(): void
     {
         $this->mockContainer->setMapping(EchoController::class, new EchoController());
@@ -117,9 +114,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertNull($this->error);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenApplicationWithController_HandlesDeleteRequest(): void
     {
         $this->mockContainer->setMapping(EchoController::class, new EchoController());
@@ -134,9 +129,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertNull($this->error);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenApplicationWithController_HandlesPatchRequest(): void
     {
         $this->mockContainer->setMapping(EchoController::class, new EchoController());
@@ -151,9 +144,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertNull($this->error);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenApplicationWithController_HandlesOptionsRequest(): void
     {
         $this->mockContainer->setMapping(EchoController::class, new EchoController());
@@ -168,9 +159,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertNull($this->error);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenApplicationWithController_WhenNoMethodRestriction_HandlesAllKindOfRequests(): void
     {
         $this->mockContainer->setMapping(EchoController::class, new EchoController());
@@ -189,9 +178,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertNull($this->error);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenApplicationWithController_HandlesErrors(): void
     {
         $this->mockContainer->setMapping(ErrorThrowingController::class, new ErrorThrowingController());
@@ -206,9 +193,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertEquals(new \RuntimeException('Test exception'), $this->error);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenApplicationWithController_HandlesFinish(): void
     {
         $this->mockContainer->setMapping(EchoController::class, new EchoController());
@@ -230,9 +215,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertNotNull($responseSpy);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenBeforeCallbackIsSet_CallbackIsExecutedBeforeController(): void
     {
         $counter = new Counter();
@@ -251,9 +234,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertEquals(2, $counter->get());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenBeforeSpecificControllerCallbackIsSet_CallbackIsExecutedBeforeControllerAndAfterGlobalBeforeCallback(): void
     {
         $counter = new Counter();
@@ -276,9 +257,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertEquals(3, $counter->get());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenAfterCallbackIsSet_CallbackIsExecutedAfterController(): void
     {
         $counter = new Counter();
@@ -297,9 +276,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertEquals(2, $counter->get());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenAfterSpecificControllerCallbackIsSet_CallbackIsExecutedAfterControllerAndBeforeGlobalAfterCallback(): void
     {
         $counter = new Counter();
@@ -322,9 +299,7 @@ class DilexIntegrationTest extends TestCase
         $this->assertEquals(3, $counter->get());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenMiddleWareCallback_WhenAfterCallbackIsSet_ExpectNoError(): void
     {
         $this->expectNotToPerformAssertions();

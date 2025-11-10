@@ -1,34 +1,84 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Clearbooks\Dilex;
 
-use Symfony\Component\Routing\Route as SymfonyRoute;
+use Closure;
 
-class Route extends SymfonyRoute
+use function sort;
+use function implode;
+
+class Route
 {
-    const OPTION_BEFORE_CONTROLLER_LISTENERS = '_before_controller_listeners';
-    const OPTION_AFTER_CONTROLLER_LISTENERS = '_after_controller_listeners';
+    private array $beforeCallbacks = [];
+    private array $afterCallbacks = [];
+
+    public function __construct(
+        protected string $path,
+        protected string|array|Closure $controller,
+        protected array $requirements = [],
+        protected array $methods = [],
+    ) {}
+
 
     public function assert( string $key, string $regex ): self
     {
-        return $this->addRequirements( [ $key => $regex ] );
-    }
+        $this->requirements[$key] = $regex;
 
-    private function addCallback( string $option, $callback ): void
-    {
-        $callbacks = (array)$this->getOption( $option );
-        $callbacks[] = $callback;
-        $this->setOption( $option, $callbacks );
-    }
-
-    public function before( $callback ): self
-    {
-        $this->addCallback( self::OPTION_BEFORE_CONTROLLER_LISTENERS, $callback );
         return $this;
     }
 
-    public function after( $callback ): self
+    public function before( string|array|Closure $callback ): self
     {
-        $this->addCallback( self::OPTION_AFTER_CONTROLLER_LISTENERS, $callback );
+        $this->beforeCallbacks[] = $callback;
+
         return $this;
+    }
+
+    public function after( string|array|Closure $callback ): self
+    {
+        $this->afterCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function getBeforeCallbacks(): array
+    {
+        return $this->beforeCallbacks;
+    }
+
+    public function getAfterCallbacks(): array
+    {
+        return $this->afterCallbacks;
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    public function getController(): array|Closure|string
+    {
+        return $this->controller;
+    }
+
+    public function getRequirements(): array
+    {
+        return $this->requirements;
+    }
+
+    public function getMethods(): array
+    {
+        return $this->methods;
+    }
+
+    public function getName(): string
+    {
+        $methods = $this->methods;
+
+        sort($methods);
+
+        return implode('_', [...$methods, $this->getPath()]);
     }
 }

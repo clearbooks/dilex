@@ -5,12 +5,11 @@ namespace Clearbooks\Dilex\EventListener\CallbackWrapper;
 
 use Clearbooks\Dilex\ContainerProvider;
 use Clearbooks\Dilex\MockContainer;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class BeforeWrapperTest extends TestCase
@@ -34,7 +33,7 @@ class BeforeWrapperTest extends TestCase
         $this->beforeWrapper = new BeforeWrapper($containerProvider);
     }
 
-    private function createTestRequestEvent(int $requestType = HttpKernelInterface::MASTER_REQUEST): RequestEvent
+    private function createTestRequestEvent(int $requestType = HttpKernelInterface::MAIN_REQUEST): RequestEvent
     {
         return new RequestEvent(
                 $this->createMock(HttpKernelInterface::class),
@@ -43,9 +42,7 @@ class BeforeWrapperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallbackReturnsResponse_ExpectResponseSetOnEvent()
     {
         $event = $this->createTestRequestEvent();
@@ -59,9 +56,7 @@ class BeforeWrapperTest extends TestCase
         $this->assertSame($response, $event->getResponse());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCalled_ExpectCallbackCalledWithCorrectParameters()
     {
         $event = $this->createTestRequestEvent();
@@ -73,9 +68,7 @@ class BeforeWrapperTest extends TestCase
         $this->assertSame([$event->getRequest()], $callbackInstance->getCallHistory());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallbackReturnsNull_ExpectOriginalResponseNotChanged()
     {
         $event = $this->createTestRequestEvent();
@@ -88,9 +81,7 @@ class BeforeWrapperTest extends TestCase
         $this->assertSame($originalResponse, $event->getResponse());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenEventIsNotMasterRequest_ExpectNothingCalledOrChanged()
     {
         $event = $this->createTestRequestEvent(HttpKernelInterface::SUB_REQUEST);

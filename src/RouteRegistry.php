@@ -1,38 +1,33 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Clearbooks\Dilex;
 
-use InvalidArgumentException;
-
 class RouteRegistry
 {
-    /**
-     * @var EndpointCallbackResolver
-     */
-    private $endpointCallbackResolver;
+    private EndpointCallbackResolver $endpointCallbackResolver;
 
     /**
      * @var Route[]
      */
-    private $routes = [];
+    private array $routes = [];
 
     public function __construct()
     {
         $this->endpointCallbackResolver = new EndpointCallbackResolver();
     }
 
-    private function createRoute( string $pattern, string $endpoint, string $method = null ): Route
+    private function createRoute( string $pattern, string $endpoint, ?string $method = null ): Route
     {
-        $route = new Route( $pattern );
-        $route->setDefault( '_controller', $this->endpointCallbackResolver->resolve( $endpoint ) );
-        if ( $method ) {
-            $route->setMethods( [ $method ] );
-        }
-        return $route;
+        return new Route(
+            path: $pattern,
+            controller: $this->endpointCallbackResolver->resolve( $endpoint ),
+            methods: $method === null ? [] : [$method]
+        );
     }
 
-    public function addRoute( string $pattern, string $endpoint, string $method = null ): Route
+    public function addRoute( string $pattern, string $endpoint, ?string $method = null ): Route
     {
         $route = $this->createRoute( $pattern, $endpoint, $method );
         $this->routes[] = $route;

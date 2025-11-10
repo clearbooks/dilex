@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Clearbooks\Dilex;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class ContainerProviderTest extends TestCase
@@ -18,17 +19,13 @@ class ContainerProviderTest extends TestCase
         $this->containerProvider = new ContainerProvider();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function GivenContainerNotSet_WhenGettingContainer_ExpectNull()
     {
         $this->assertNull($this->containerProvider->getContainer());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenSettingContainer_ThenGettingContainer_ExpectContainerReturned()
     {
         $container = new MockContainer([]);

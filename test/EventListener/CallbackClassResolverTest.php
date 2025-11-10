@@ -5,6 +5,7 @@ namespace Clearbooks\Dilex\EventListener;
 
 use Clearbooks\Dilex\ContainerProvider;
 use Clearbooks\Dilex\MockContainer;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -29,9 +30,7 @@ class CallbackClassResolverTest extends TestCase
         $this->callbackClassResolver = new CallbackClassResolver($containerProvider);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenPassingNonCallableObject_ExpectException()
     {
         $this->expectException(RuntimeException::class);
@@ -39,9 +38,7 @@ class CallbackClassResolverTest extends TestCase
         $this->callbackClassResolver->resolve(new \stdClass());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenPassingCallableObject_ExpectSameObjectReturned()
     {
         $callable = new CallableDummy();
@@ -49,9 +46,7 @@ class CallbackClassResolverTest extends TestCase
         $this->assertSame($callable, $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenPassingCallableArray_AndFirstArrayParameterIsObject_ExpectSameArrayReturned()
     {
         $callable = [new CallableDummy(), 'execute'];
@@ -59,9 +54,7 @@ class CallbackClassResolverTest extends TestCase
         $this->assertSame($callable, $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenPassingCallableArray_AndFirstArrayParameterIsString_ExpectClassResolved()
     {
         $callable = [CallableDummy::class, 'execute'];
@@ -71,9 +64,7 @@ class CallbackClassResolverTest extends TestCase
         $this->assertSame([$callableDummyInstance, 'execute'], $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenPassingNonCallableStringWithDoubleColon_ExpectException()
     {
         $this->expectException(RuntimeException::class);
@@ -82,9 +73,7 @@ class CallbackClassResolverTest extends TestCase
         $this->callbackClassResolver->resolve($callable);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenPassingCallableStringWithDoubleColon_ExpectCallableStringReturnedAsItIs()
     {
         $callable = CallableDummy::class . '::run';
@@ -92,9 +81,7 @@ class CallbackClassResolverTest extends TestCase
         $this->assertSame($callable, $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenPassingStringWithoutDoubleColon_ExpectClassResolved()
     {
         $callable = CallableDummy::class;

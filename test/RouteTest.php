@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Clearbooks\Dilex;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class RouteTest extends TestCase
@@ -15,55 +16,49 @@ class RouteTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->route = new Route('/test');
+        $this->route = new Route('/test', '');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallingAssert_ExpectRequirementAdded()
     {
         $this->route->assert('id', 'test');
-        $this->assertEquals('test', $this->route->getRequirement('id'));
+        $this->assertEquals('test', $this->route->getRequirements()['id']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallingBefore_ExpectBeforeControllerListenersAdded()
     {
         $testCallback = [self::class, 'setUp'];
         $this->route->before($testCallback);
         $this->assertEquals(
                 [$testCallback],
-                $this->route->getOption(Route::OPTION_BEFORE_CONTROLLER_LISTENERS)
+                $this->route->getBeforeCallbacks()
         );
 
         $testCallback2 = [self::class, 'tearDown'];
         $this->route->before($testCallback2);
         $this->assertEquals(
                 [$testCallback, $testCallback2],
-                $this->route->getOption(Route::OPTION_BEFORE_CONTROLLER_LISTENERS)
+                $this->route->getBeforeCallbacks()
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCallingAfter_ExpectAfterControllerListenersAdded()
     {
         $testCallback = [self::class, 'setUp'];
         $this->route->after($testCallback);
         $this->assertEquals(
                 [$testCallback],
-                $this->route->getOption(Route::OPTION_AFTER_CONTROLLER_LISTENERS)
+                $this->route->getAfterCallbacks()
         );
 
         $testCallback2 = [self::class, 'tearDown'];
         $this->route->after($testCallback2);
         $this->assertEquals(
                 [$testCallback, $testCallback2],
-                $this->route->getOption(Route::OPTION_AFTER_CONTROLLER_LISTENERS)
+                $this->route->getAfterCallbacks()
         );
     }
 }

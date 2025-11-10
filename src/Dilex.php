@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Clearbooks\Dilex;
 
 use Clearbooks\Dilex\EventListener\CallbackWrapper\AfterWrapper;
@@ -11,7 +14,6 @@ use Clearbooks\Dilex\EventListener\EventListenerRegistry;
 use Clearbooks\Dilex\EventListener\ListenerRunner\AfterControllerListenerRunner;
 use Clearbooks\Dilex\EventListener\ListenerRunner\BeforeControllerListenerRunner;
 use Clearbooks\Dilex\EventListener\StringToResponseListener;
-use Exception;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -21,87 +23,36 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\RouteCollectionBuilder;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+
+use function trim;
+use function rtrim;
 
 class Dilex extends Kernel implements RouteContainer, EventListenerApplier
 {
     use MicroKernelTrait;
 
-    /**
-     * @var ContainerInterface|null
-     */
-    private $fallbackContainerInterface;
+    private RouteRegistry $routeRegistry;
+    private ContainerProvider $containerProvider;
+    private EventListenerRegistry $eventListenerRegistry;
+    private BeforeWrapper $beforeEventListenerWrapper;
+    private AfterWrapper $afterEventListenerWrapper;
+    private FinishWrapper $finishEventListenerWrapper;
+    private ErrorWrapper $errorEventListenerWrapper;
+    private BeforeControllerListenerRunner $beforeControllerListenerRunner;
+    private AfterControllerListenerRunner $afterControllerListenerRunner;
+    private StringToResponseListener $stringToResponseListener;
+    private ?string $projectDirectory = null;
+    private ?string $cacheDirectory = null;
+    private ?string $logDirectory = null;
 
-    /**
-     * @var RouteRegistry
-     */
-    private $routeRegistry;
-
-    /**
-     * @var ContainerProvider
-     */
-    private $containerProvider;
-
-    /**
-     * @var EventListenerRegistry
-     */
-    private $eventListenerRegistry;
-
-    /**
-     * @var BeforeWrapper
-     */
-    private $beforeEventListenerWrapper;
-
-    /**
-     * @var AfterWrapper
-     */
-    private $afterEventListenerWrapper;
-
-    /**
-     * @var FinishWrapper
-     */
-    private $finishEventListenerWrapper;
-
-    /**
-     * @var ErrorWrapper
-     */
-    private $errorEventListenerWrapper;
-
-    /**
-     * @var BeforeControllerListenerRunner
-     */
-    private $beforeControllerListenerRunner;
-
-    /**
-     * @var AfterControllerListenerRunner
-     */
-    private $afterControllerListenerRunner;
-
-    /**
-     * @var StringToResponseListener
-     */
-    private $stringToResponseListener;
-
-    /**
-     * @var string|null
-     */
-    private $projectDirectory = null;
-
-    /**
-     * @var string|null
-     */
-    private $cacheDirectory = null;
-
-    /**
-     * @var string|null
-     */
-    private $logDirectory = null;
-
-    public function __construct( string $environment, bool $debug,
-                                 ContainerInterface $fallbackContainerInterface = null )
-    {
+    public function __construct(
+        string $environment,
+        bool $debug,
+        private readonly ?ContainerInterface $fallbackContainerInterface = null
+    ) {
         parent::__construct( $environment, $debug );
-        $this->fallbackContainerInterface = $fallbackContainerInterface;
+
         $this->routeRegistry = new RouteRegistry();
         $this->containerProvider = new ContainerProvider();
         $this->eventListenerRegistry = new EventListenerRegistry();
@@ -129,7 +80,8 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         $this->logDirectory = $logDirectory === null ? null : ( '/' . trim( $logDirectory, '/' ) );
     }
 
-    public function getProjectDir()
+    #[\Override]
+    public function getProjectDir(): string
     {
         if ( $this->projectDirectory === null ) {
             return parent::getProjectDir();
@@ -138,7 +90,8 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         return $this->projectDirectory;
     }
 
-    public function getCacheDir()
+    #[\Override]
+    public function getCacheDir(): string
     {
         if ( $this->cacheDirectory === null ) {
             return parent::getCacheDir();
@@ -147,7 +100,8 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         return $this->getProjectDir() . $this->cacheDirectory . $this->getEnvironment();
     }
 
-    public function getLogDir()
+    #[\Override]
+    public function getLogDir(): string
     {
         if ( $this->logDirectory === null ) {
             return parent::getLogDir();
@@ -156,6 +110,7 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         return $this->getProjectDir() . $this->logDirectory;
     }
 
+    #[\Override]
     public function registerBundles(): array
     {
         return [
@@ -168,19 +123,21 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
 
     }
 
-    protected function configureRoutes( RouteCollectionBuilder $routes ): void
+    protected function configureRoutes( RoutingConfigurator $routes ): void
     {
         foreach ( $this->routeRegistry->getRoutes() as $route ) {
-            $routes->addRoute( $route );
+            RouteApplier::applyRouteToSymfony($route, $routes);
         }
     }
 
-    protected function getContainerBaseClass()
+    #[\Override]
+    protected function getContainerBaseClass(): string
     {
         return ContainerWithFallback::class;
     }
 
-    protected function initializeContainer()
+    #[\Override]
+    protected function initializeContainer(): void
     {
         parent::initializeContainer();
 
@@ -228,41 +185,49 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         $this->eventListenerRegistry->registerEvents( $eventDispatcher );
     }
 
+    #[\Override]
     public function match( string $pattern, string $endpoint ): Route
     {
         return $this->routeRegistry->addRoute( $pattern, $endpoint );
     }
 
+    #[\Override]
     public function get( string $pattern, string $endpoint ): Route
     {
         return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_GET );
     }
 
+    #[\Override]
     public function post( string $pattern, string $endpoint ): Route
     {
         return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_POST );
     }
 
+    #[\Override]
     public function put( string $pattern, string $endpoint ): Route
     {
         return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_PUT );
     }
 
+    #[\Override]
     public function delete( string $pattern, string $endpoint ): Route
     {
         return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_DELETE );
     }
 
+    #[\Override]
     public function options( string $pattern, string $endpoint ): Route
     {
         return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_OPTIONS );
     }
 
+    #[\Override]
     public function patch( string $pattern, string $endpoint ): Route
     {
         return $this->routeRegistry->addRoute( $pattern, $endpoint, Request::METHOD_PATCH );
     }
 
+    #[\Override]
     public function before( $callback, int $priority = 0 ): void
     {
         $this->eventListenerRegistry->addEvent(
@@ -274,6 +239,7 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         );
     }
 
+    #[\Override]
     public function after( $callback, int $priority = 0 ): void
     {
         $this->eventListenerRegistry->addEvent(
@@ -285,6 +251,7 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         );
     }
 
+    #[\Override]
     public function finish( $callback, int $priority = 0 ): void
     {
         $this->eventListenerRegistry->addEvent(
@@ -296,6 +263,7 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         );
     }
 
+    #[\Override]
     public function error( $callback, int $priority = -8 ): void
     {
         $this->eventListenerRegistry->addEvent(
@@ -307,13 +275,7 @@ class Dilex extends Kernel implements RouteContainer, EventListenerApplier
         );
     }
 
-    /**
-     * Handles the request and delivers the response.
-     *
-     * @param Request|null $request
-     * @throws Exception
-     */
-    public function run( Request $request = null ): void
+    public function run( ?Request $request = null ): void
     {
         if ( !$request ) {
             $request = Request::createFromGlobals();

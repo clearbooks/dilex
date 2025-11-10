@@ -6,6 +6,7 @@ namespace Clearbooks\Dilex\EventListener\CallbackWrapper;
 use Clearbooks\Dilex\ContainerProvider;
 use Clearbooks\Dilex\MockContainer;
 use Exception;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,9 +46,7 @@ class FinishWrapperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function WhenCalled_ExpectCallbackCalledWithCorrectParameters()
     {
         $event = $this->createTestTerminateEvent();

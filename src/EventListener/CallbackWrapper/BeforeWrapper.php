@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Clearbooks\Dilex\EventListener\CallbackWrapper;
 
 use Clearbooks\Dilex\ContainerProvider;
@@ -6,28 +9,22 @@ use Clearbooks\Dilex\EventListener\CallbackClassResolver;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
+use function call_user_func;
+
 class BeforeWrapper implements CallbackWrapper
 {
-    /**
-     * @var ContainerProvider
-     */
-    private $containerProvider;
-
-    /**
-     * @var CallbackClassResolver
-     */
-    private $callbackResolver;
+    private CallbackClassResolver $callbackResolver;
 
     public function __construct( ContainerProvider $containerProvider )
     {
-        $this->containerProvider = $containerProvider;
         $this->callbackResolver = new CallbackClassResolver( $containerProvider );
     }
 
+    #[\Override]
     public function wrap( $callback ): callable
     {
         return function( RequestEvent $event ) use ( $callback ) {
-            if ( !$event->isMasterRequest() ) {
+            if ( !$event->isMainRequest() ) {
                 return;
             }
 
